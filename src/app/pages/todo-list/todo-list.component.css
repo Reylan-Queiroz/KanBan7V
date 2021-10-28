@@ -1,3 +1,5 @@
+@import '~@angular/cdk/overlay-prebuilt.css';
+
 .example-container {
    width: 270px;
    max-width: 100%;
@@ -13,4 +15,17 @@
    border-radius: 4px;
    overflow: hidden;
    display: block;
+}
+
+[contenteditable] {
+   padding: 5px;
+   white-space: pre;
+   outline: 0;
+   line-height: 18px;
+}
+
+[contenteditable]:focus {
+   border: 1px solid black;
+   border-radius: 4px;
+   border-color: green;
 }

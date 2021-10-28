@@ -2,33 +2,44 @@
    <div class="row">
       <div class="col-auto" style="padding-right: 0;">
          <div class="wrapper" dragula="COLUMNS" [(dragulaModel)]="columnsAndTickets" (dragulaModelChange)="moveColumn($event)">
-            <div class="example-container rounded" *ngFor="let column of columnsAndTickets; let i = index" style="min-height: 50px;">
+            <div class="example-container rounded" *ngFor="let column of columnsAndTickets; let i = index">
                <div class="mb-3 text-dark p-2 bg-light rounded-top">
-                  <h5 class="group-handle">{{column.columnName}}</h5>
+                  <div class="row">
+                     <div class="col-9">
+                        <h5 class="group-handle" id="{{'inpColumnName' + i}}">
+                           <span contenteditable (pointerout)="editColumnName($event, column)">{{column.columnName}}</span>
+                        </h5>
+                     </div>
+                     <div class="col-3 dropend text-end">
+                        <button type="button" class="btn btn-sm">
+                           <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                     </div>
+                  </div>
                </div>
-               <div class="p-2 py-0" dragula="ITEMS" [(dragulaModel)]="column.ticketList" (dragulaModelChange)="moveTicket($event)">
+               <div class="p-2 py-0" dragula="ITEMS" [(dragulaModel)]="column.ticketList" (dragulaModelChange)="moveTicket($event)" style="min-height: 20px;">
                   <div class="card text-dark bg-light mb-3" *ngFor="let ticket of column.ticketList">
                      <div class="card-header px-2 py-1">
-                        <span class="float-end" style="cursor: pointer;">
+                        <span class="float-end" style="cursor: pointer;" (click)="openDialogEditTicket(ticket)">
                            <i class="fas fa-edit" style="font-size: 15px"></i>
                         </span>
                      </div>
                      <div class="card-body">
-                        <p class="card-text small">{{ticket.ticketName}}</p>
+                        <p class="card-text small" id="{{'inpTicketName' + i}}">{{ticket.ticketName}}</p>
                      </div>
                   </div>
                </div>
                <div class="p-2 pt-0">
-                  <div class="collapse mb-3" id="{{'collapseCreateTicket'+i}}">
+                  <div class="collapse mb-3" id="{{'collapseCreateTicket' + i}}">
                      <div class="card card-body">
                         <form class="input-group" [formGroup]="formTicket">
                            <input type="text" id="" class="form-control form-control-sm" placeholder="Insira o nome do ticket" formControlName="nameTicket">
-                           <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addTicket(column.columnId)"><i class="fas fa-plus"></i></button>
+                           <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addTicket($event, column.columnId)"><i class="fas fa-plus"></i></button>
                         </form>
                      </div>
                   </div>
 
-                  <button type="button" class="btn btn-sm btn-secondary w-100" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapseCreateTicket'+i" aria-expanded="false">
+                  <button type="button" class="btn btn-sm btn-secondary w-100" id="{{'btnCollapse' + i}}" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapseCreateTicket' + i" aria-expanded="false">
                      <i class="fas text-light fa-plus-circle" style="margin-right: 15px;"></i>Adicionar Ticket
                   </button>
                </div>
@@ -36,7 +47,7 @@
          </div>
       </div>
       <div class="col-2" style="padding-left: 0;">
-         <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#collapseCreateColumn" aria-expanded="false">
+         <button type="button" class="btn btn-sm btn-secondary" id="btnCollapseAddColumn" data-bs-toggle="collapse" data-bs-target="#collapseCreateColumn" aria-expanded="false">
             <i class="fas fa-plus" style="margin-right: 15px;"></i>Adicionar outra lista
          </button>
 
@@ -44,28 +55,9 @@
             <div class="card card-body">
                <form class="input-group" [formGroup]="formColumn">
                   <input type="text" id="" class="form-control form-control-sm" placeholder="Insira o nome da lista" formControlName="nameColumn">
-                  <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addColumn()" [disabled]="formColumn.invalid"><i class="fas fa-plus"></i></button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addColumn($event)" [disabled]="formColumn.invalid"><i class="fas fa-plus"></i></button>
                </form>
             </div>
-         </div>
-      </div>
-   </div>
-</div>
-
-
-<div class="modal fade" id="createTicket" tabindex="-1" aria-hidden="true">
-   <div class="modal-dialog">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h5 class="modal-title">Modal title</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-         </div>
-         <div class="modal-body">
-            ...
-         </div>
-         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
          </div>
       </div>
    </div>

@@ -11,5 +11,7 @@ export class Column {
       this.columnId = _columnId;
       this.columnName = _columnName;
       this.ticketList = _ticketList;
+
+      return this;
    }
 }
