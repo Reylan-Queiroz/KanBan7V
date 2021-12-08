@@ -31,3 +31,7 @@
    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
    filter: alpha(opacity=20);
 }
+
+.trend-dialog .mat-dialog-container{
+   overflow-y: hidden !important;
+}

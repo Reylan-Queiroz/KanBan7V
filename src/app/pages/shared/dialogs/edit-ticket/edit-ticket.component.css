@@ -1,0 +1,11 @@
+/* @media screen and (max-height: 768px) {
+   div.overflow-auto{
+      height: 230px;
+   }
+}
+
+@media screen and (min-height: 800px) {
+   div.overflow-auto{
+      height: 370px;
+   }
+} */

@@ -1,8 +1,9 @@
-@import '~@angular/cdk/overlay-prebuilt.css';
+@import "~@angular/cdk/overlay-prebuilt.css";
 
 .example-container {
    width: 270px;
    max-width: 100%;
+
    margin: 0 25px 25px 0;
    display: inline-block;
    vertical-align: top;
@@ -18,14 +19,40 @@
 }
 
 [contenteditable] {
-   padding: 5px;
-   white-space: pre;
    outline: 0;
-   line-height: 18px;
 }
 
-[contenteditable]:focus {
-   border: 1px solid black;
-   border-radius: 4px;
-   border-color: green;
+#ticketList::-webkit-scrollbar-track {
+   background-color: #f4f4f4;
+}
+#ticketList::-webkit-scrollbar {
+   width: 6px;
+   background: #f4f4f4;
+}
+#ticketList::-webkit-scrollbar-thumb {
+   background: #dad7d7;
+}
+
+.box::-webkit-scrollbar-track {
+   background-color: #f4f4f4;
+}
+.box::-webkit-scrollbar {
+   height: 15px;
+   background: #f4f4f4;
+}
+.box::-webkit-scrollbar-thumb {
+   background: #dad7d7;
+}
+
+.box {
+   display: flex;
+   flex-direction: row;
+
+   height: 99vh;
+
+   padding: 15px;
+   padding-bottom: 0px;
+
+   overflow-x: auto;
+   overflow-y: hidden;
 }
