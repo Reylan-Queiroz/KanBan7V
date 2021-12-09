@@ -19,37 +19,42 @@ export class TodoListComponent implements OnInit, OnChanges {
    public formTicket: FormGroup;
    public formColumnName: FormGroup;
 
-   constructor(private _dragulaService: DragulaService, private _formBuilder: FormBuilder, public dialog: MatDialog) {
-      this._dragulaService.createGroup('COLUMNS', {
+   constructor(
+      private dragulaService: DragulaService,
+      private formBuilder: FormBuilder,
+      private matDialog: MatDialog
+   ) {
+
+      this.dragulaService.createGroup('COLUMNS', {
          direction: 'horizontal',
          moves: (el, source, handle) => handle.className === 'group-handle',
       });
 
-      this.formColumn = this._formBuilder.group({
+      this.formColumn = this.formBuilder.group({
          nameColumn: ['', Validators.compose([
             Validators.minLength(3),
             Validators.maxLength(18),
          ])]
       });
 
-      this.formTicket = this._formBuilder.group({
+      this.formTicket = this.formBuilder.group({
          nameTicket: ['', Validators.compose([
             Validators.minLength(3),
             Validators.maxLength(20),
          ])]
       });
 
-      this.formColumnName = this._formBuilder.group({
+      this.formColumnName = this.formBuilder.group({
          columnName: ['', Validators.compose([
             Validators.minLength(3),
             Validators.maxLength(18)
          ])]
       });
-
-      this.loadColumnsAndTickets();
    }
 
-   ngOnInit() { }
+   ngOnInit() {
+      this.loadColumnsAndTickets();
+   }
 
    ngOnChanges(changes: SimpleChanges): void { }
 
@@ -142,7 +147,7 @@ export class TodoListComponent implements OnInit, OnChanges {
    }
 
    public openDialogEditTicket(ticket: Ticket) {
-      const dialogRef = this.dialog.open(EditTicketComponent, {
+      const dialogRef = this.matDialog.open(EditTicketComponent, {
          width: '980px',
          height: '90%',
          position: { top: '40px' },

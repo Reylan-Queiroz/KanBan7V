@@ -35,7 +35,13 @@
                <div class="collapse mb-3" id="{{'collapseCreateTicket' + i}}">
                   <div class="card card-body">
                      <form class="input-group" [formGroup]="formTicket">
-                        <input type="text" id="{{'inputTicket' + i}}" class="form-control form-control-sm" placeholder="Insira o nome do ticket" formControlName="nameTicket" (keypress)="addTicket($event, column.columnId)">
+                        <input
+                           type="text"
+                           id="{{'inputTicket' + i}}"
+                           class="form-control form-control-sm"
+                           placeholder="Insira o nome do ticket"
+                           formControlName="nameTicket"
+                           (keypress)="addTicket($event, column.columnId)">
 
                         <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addTicket($event, column.columnId)" [disabled]="formTicket.invalid"><i class="fas fa-plus"></i></button>
                      </form>

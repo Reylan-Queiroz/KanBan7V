@@ -30,13 +30,14 @@ export class EditTicketComponent implements OnInit {
    public conversationCtrl = new FormControl();
 
    public separatorKeysCodes: number[] = [ENTER, COMMA];
+
    public allMembers: any = [];
    public allTags: any = [];
 
    public filteredMembers: Observable<People[]>;
    public filteredTags: any = [];
 
-   get sortConversation() {
+   public get sortConversation() {
       if (this.ticket.conversation != null) {
          return this.ticket.conversation.sort((a, b) => {
             return <any>new Date(b.dateTime) - <any>new Date(a.dateTime);
@@ -58,14 +59,16 @@ export class EditTicketComponent implements OnInit {
    @ViewChild('memberInput', { static: false }) memberInput: ElementRef<HTMLInputElement>;
    @ViewChild('auto', { static: false }) matAutocomplete: MatAutocomplete;
 
-   constructor(public dialogRef: MatDialogRef<EditTicketComponent>,
+   constructor(
+      public dialogRef: MatDialogRef<EditTicketComponent>,
       @Inject(MAT_DIALOG_DATA) public ticket: Ticket,
-      private _memberService: MemberService,
-      private _tagService: TagService) { }
+      private memberService: MemberService,
+      private tagService: TagService
+   ) { }
 
    async ngOnInit() {
-      this.allMembers = await this._memberService.getAll().toPromise();
-      this.allTags = await this._tagService.getAll().toPromise();
+      this.allMembers = await this.memberService.getAll().toPromise();
+      this.allTags = await this.tagService.getAll().toPromise();
 
       this.filteredMembers = this.memberCtrl.valueChanges.pipe(
          startWith(null),
@@ -107,7 +110,7 @@ export class EditTicketComponent implements OnInit {
    private filterChip(memberName: string): People[] {
       const filterValue = memberName.toLowerCase();
 
-      return this.allMembers.filter(member => member.peopleName.toLowerCase().indexOf(filterValue) === 0);
+      return this.allMembers.filter((member: People) => member.peopleName.toLowerCase().indexOf(filterValue) === 0);
    }
 
    public addConversation(event: KeyboardEvent): void {
@@ -144,7 +147,7 @@ export class EditTicketComponent implements OnInit {
       const tagId = Number.parseInt(event.source.id);
       const tagChecked = event.checked;
 
-      let tag: Tag = this.ticket.tag.find(l => l.tagId === tagId);
+      let tag: Tag = this.ticket.tag.find((tag: Tag) => tag.tagId === tagId);
       tag.tagChecked = tagChecked;
    }
 
