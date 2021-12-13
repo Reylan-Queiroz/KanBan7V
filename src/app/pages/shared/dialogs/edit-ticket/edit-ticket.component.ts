@@ -1,8 +1,8 @@
-import { Component, ElementRef, Inject, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { MatAutocomplete, MatAutocompleteSelectedEvent, MatCheckboxChange, MatInput, MatSlideToggle, MatSlideToggleChange } from '@angular/material';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatCheckboxChange } from '@angular/material';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs/internal/Observable';
 import { map, startWith } from 'rxjs/operators';
@@ -20,13 +20,12 @@ import { Utils } from 'src/app/helpers/utils';
    styleUrls: ['./edit-ticket.component.css']
 })
 export class EditTicketComponent implements OnInit {
-   public visible = true;
-   public selectable = true;
-   public removable = true;
-   public addOnBlur = false;
+   public matChipConfiguration = { visible: true, selectable: true, removable: true, addOnBlur: false }
+
    public description: string = this.ticket.description;
 
    public memberCtrl = new FormControl();
+   public searchTagCtrl = new FormControl();
    public conversationCtrl = new FormControl();
 
    public separatorKeysCodes: number[] = [ENTER, COMMA];
@@ -35,25 +34,15 @@ export class EditTicketComponent implements OnInit {
    public allTags: any = [];
 
    public filteredMembers: Observable<People[]>;
-   public filteredTags: any = [];
+   public filteredTags: Observable<Tag[]>;
 
    public get sortConversation() {
       if (this.ticket.conversation != null) {
-         return this.ticket.conversation.sort((a, b) => {
-            return <any>new Date(b.dateTime) - <any>new Date(a.dateTime);
-         });
+         return this.ticket.conversation.sort(
+            (a, b) => {
+               return <any>new Date(b.dateTime) - <any>new Date(a.dateTime);
+            });
       }
-   }
-
-   private _tagFilter: string = "";
-   public get tagFilter() {
-      return this._tagFilter;
-   }
-   public set tagFilter(value: string) {
-      this._tagFilter = value;
-      this.filteredTags = this.tagFilter
-         ? this.filterTags(this.tagFilter)
-         : this.allTags;
    }
 
    @ViewChild('memberInput', { static: false }) memberInput: ElementRef<HTMLInputElement>;
@@ -72,7 +61,15 @@ export class EditTicketComponent implements OnInit {
 
       this.filteredMembers = this.memberCtrl.valueChanges.pipe(
          startWith(null),
-         map((memberName: string | null) => memberName ? this.filterChip(memberName) : this.allMembers.slice()));
+         map(
+            (memberName: string | null) => memberName ? this.filterChip(memberName) : this.allMembers.slice()
+         ));
+
+      this.filteredTags = this.searchTagCtrl.valueChanges.pipe(
+         startWith(null),
+         map(
+            (tagName: string | null) => tagName ? this.filterTag(tagName) : this.allTags.slice()
+         ));
    }
 
    public addChip(event: MatChipInputEvent): void {
@@ -82,7 +79,7 @@ export class EditTicketComponent implements OnInit {
       if ((value || '').trim()) {
          const peopleId = this.ticket.assignedToPeople.length + 1;
 
-         this.ticket.assignedToPeople.push(new People().setItem(peopleId, value));
+         this.ticket.assignedToPeople.push(new People(peopleId, value));
       }
 
       if (input) {
@@ -102,7 +99,7 @@ export class EditTicketComponent implements OnInit {
       const memberId = this.ticket.assignedToPeople.length + 1;
       const memberName = event.option.viewValue;
 
-      this.ticket.assignedToPeople.push(new People().setItem(memberId, memberName));
+      this.ticket.assignedToPeople.push(new People(memberId, memberName));
       this.memberInput.nativeElement.value = '';
       this.memberCtrl.setValue(null);
    }
@@ -110,7 +107,17 @@ export class EditTicketComponent implements OnInit {
    private filterChip(memberName: string): People[] {
       const filterValue = memberName.toLowerCase();
 
-      return this.allMembers.filter((member: People) => member.peopleName.toLowerCase().indexOf(filterValue) === 0);
+      return this.allMembers.filter(
+         (member: People) => member.peopleName.toLowerCase().indexOf(filterValue) === 0
+      );
+   }
+
+   private filterTag(tagName: string): Tag[] {
+      const filterValue = tagName.toLowerCase();
+
+      return this.allTags.filter(
+         (tag: Tag) => tag.tagName.toLowerCase().indexOf(filterValue) !== -1
+      );
    }
 
    public addConversation(event: KeyboardEvent): void {
@@ -120,7 +127,7 @@ export class EditTicketComponent implements OnInit {
          const conversationText: string = input.value;
 
          if ((conversationText || '').trim()) {
-            this.ticket.conversation.push(new Conversation().setItem(conversationId, conversationText, new Date(), new People()));
+            this.ticket.conversation.push(new Conversation(conversationId, conversationText, new Date(), new People(1, "Reylan")));
 
             this.conversationCtrl.setValue(null);
          }
@@ -130,12 +137,12 @@ export class EditTicketComponent implements OnInit {
    public addNewTag(event: KeyboardEvent) {
       if (event.key === 'Enter') {
          const input: HTMLInputElement = (<HTMLInputElement>event.target);
-         const tagId = this.ticket.tag.length + 1;
+         const tagId = this.ticket.tagList.length + 1;
          const tagText: string = input.value;
          const tagChecked: boolean = false;
 
          if ((tagText || '').trim()) {
-            this.ticket.tag.push(new Tag().setItem(tagId, tagText, tagChecked));
+            this.ticket.tagList.push(new Tag(tagId, tagText, tagChecked));
 
             input.value = '';
             Utils.clickButton('btnCollapseAddTag');
@@ -147,20 +154,15 @@ export class EditTicketComponent implements OnInit {
       const tagId = Number.parseInt(event.source.id);
       const tagChecked = event.checked;
 
-      let tag: Tag = this.ticket.tag.find((tag: Tag) => tag.tagId === tagId);
+      let tag: Tag = this.ticket.tagList.find(
+         (tag: Tag) => tag.tagId === tagId
+      );
+
       tag.tagChecked = tagChecked;
    }
 
-   public focusInput(inputName) {
+   public focusInput(inputName: string) {
       Utils.autoFocus(inputName);
-   }
-
-   private filterTags(filterBy: string): any {
-      filterBy = filterBy.toLocaleLowerCase();
-      return this.allTags.filter(
-         (tag: Tag) =>
-            tag.tagName.toLocaleLowerCase().indexOf(filterBy) !== -1
-      );
    }
 }
 

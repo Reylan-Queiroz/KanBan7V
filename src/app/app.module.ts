@@ -17,7 +17,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatIconModule, MatNativeDateModule, MatRadioButton, MatRadioModule, MatSlideToggleModule } from '@angular/material';
-
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
    declarations: [
@@ -35,6 +35,7 @@ import { MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatIconModule,
       HttpClientModule,
       DragulaModule.forRoot(),
       BrowserAnimationsModule,
+      ToastrModule.forRoot(),
 
       MatDialogModule,
       MatChipsModule,

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GlobalConstants } from 'src/app/helpers/global-constants';
 import { CrudInterface } from '../interfaces/crud-interface';
+import { Tag } from '../models/tag';
 
 @Injectable({
    providedIn: 'root'
@@ -15,7 +16,7 @@ export class TagService implements CrudInterface {
    }
 
    getAll<T>() {
-      return this.http.get(`${GlobalConstants.apiURLMockoon}tags`);
+      return this.http.get<Tag[]>(`${GlobalConstants.apiURLMockoon}tags`);
    }
 
    getById<T>(id: number) {

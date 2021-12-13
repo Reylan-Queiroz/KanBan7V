@@ -3,6 +3,7 @@ import { Form, FormBuilder, FormControl, FormGroup, Validators } from '@angular/
 import { MatButton } from '@angular/material';
 import { MatDialog } from '@angular/material/dialog';
 import { DragulaService } from 'ng2-dragula';
+import { ToastrService } from 'ngx-toastr';
 import { Column } from 'src/app/domain/models/column';
 import { Ticket } from 'src/app/domain/models/ticket';
 import { Utils } from 'src/app/helpers/utils';
@@ -13,23 +14,17 @@ import { EditTicketComponent } from '../shared/dialogs/edit-ticket/edit-ticket.c
    templateUrl: './todo-list.component.html',
    styleUrls: ['./todo-list.component.css']
 })
-export class TodoListComponent implements OnInit, OnChanges {
+export class TodoListComponent implements OnInit {
    public columnsAndTickets: Column[] = [];
    public formColumn: FormGroup;
    public formTicket: FormGroup;
-   public formColumnName: FormGroup;
 
    constructor(
       private dragulaService: DragulaService,
       private formBuilder: FormBuilder,
-      private matDialog: MatDialog
+      private matDialog: MatDialog,
+      private toastrService: ToastrService
    ) {
-
-      this.dragulaService.createGroup('COLUMNS', {
-         direction: 'horizontal',
-         moves: (el, source, handle) => handle.className === 'group-handle',
-      });
-
       this.formColumn = this.formBuilder.group({
          nameColumn: ['', Validators.compose([
             Validators.minLength(3),
@@ -43,20 +38,16 @@ export class TodoListComponent implements OnInit, OnChanges {
             Validators.maxLength(20),
          ])]
       });
-
-      this.formColumnName = this.formBuilder.group({
-         columnName: ['', Validators.compose([
-            Validators.minLength(3),
-            Validators.maxLength(18)
-         ])]
-      });
    }
 
    ngOnInit() {
+      this.dragulaService.createGroup('COLUMNS', {
+         direction: 'horizontal',
+         moves: (el, source, handle) => handle.className === 'group-handle',
+      });
+
       this.loadColumnsAndTickets();
    }
-
-   ngOnChanges(changes: SimpleChanges): void { }
 
    public addTicket(event: any, columnId: number) {
       if (event.keyCode === 13 || event.type === 'click') {
@@ -68,7 +59,7 @@ export class TodoListComponent implements OnInit, OnChanges {
             return;
          }
 
-         column.ticketList.push(new Ticket().setItem(ticketId, columnId, ticketName, '', new Date(), new Date(), [], [], []));
+         column.ticketList.push(new Ticket(ticketId, columnId, ticketName, '', new Date(), new Date(), [], [], []));
 
          Utils.clearForm(this.formTicket);
          Utils.clickButton(event.path[5].lastElementChild.lastChild.id);
@@ -86,7 +77,7 @@ export class TodoListComponent implements OnInit, OnChanges {
             return;
          }
 
-         this.columnsAndTickets.push(new Column().setItem(columnId, columnName, []));
+         this.columnsAndTickets.push(new Column(columnId, columnName, []));
 
          Utils.clearForm(this.formColumn);
          Utils.clickButton('btnCollapseAddColumn');
@@ -105,45 +96,53 @@ export class TodoListComponent implements OnInit, OnChanges {
       }
    }
 
-
    public save() {
       const data = JSON.stringify(this.columnsAndTickets);
       localStorage.setItem('columnsAndTickets', data);
    }
 
-   public moveColumn(event) {
+   public move(event) {
       this.save();
    }
 
-   public moveTicket(event) {
-      this.save();
-   }
-
-   public editColumnName(event: any, column: Column) {
-      let newName: string = event.target.innerHTML;
+   public editColumnName(event: FocusEvent, column: Column) {
+      const element: HTMLElement = (<HTMLElement>event.target);
+      let newName = element.innerText;
 
       if (newName.length > 18) {
+         this.showToastrError('', 'O nome excedeu o limite de caracteres(18).');
+         element.innerText = column.columnName;
+
          return;
       } else {
+         if (newName === column.columnName)
+            return;
+
          column.columnName = newName.trim();
+         this.showToastrSuccess('', 'Nome alterado com sucesso.')
+
          this.save();
       }
    }
 
-   public editTicketName(event: any, ticket: Ticket) {
-      let newName: string = event.target.innerHTML;
+   public editTicketName(event: FocusEvent, ticket: Ticket) {
+      const element: HTMLElement = (<HTMLElement>event.target);
+      let newName = element.innerText;
 
-      ticket.ticketName = newName;
+      if (newName.length > 18) {
+         this.showToastrError('', 'O nome excedeu o limite de caracteres(18).');
+         element.innerText = ticket.ticketName;
 
-      this.save();
-   }
+         return;
+      } else {
+         if (newName === ticket.ticketName)
+            return;
 
-   public editDescription(event: any, ticket: Ticket) {
-      let newName: string = event.target.innerHTML;
+         ticket.ticketName = newName.trim();
+         this.showToastrSuccess('', 'Nome alterado com sucesso.');
 
-      ticket.description = newName;
-
-      this.save();
+         this.save();
+      }
    }
 
    public openDialogEditTicket(ticket: Ticket) {
@@ -179,6 +178,7 @@ export class TodoListComponent implements OnInit, OnChanges {
          if (result === undefined) {
             return;
          }
+
          newTicket = dialogRef.componentInstance.ticket;
          newTicket.description = dialogRef.componentInstance.description;
 
@@ -192,8 +192,14 @@ export class TodoListComponent implements OnInit, OnChanges {
    }
 
    public focusInput(inputId: string) {
-      setTimeout(function () {
-         document.getElementById(inputId).focus();
-      }, 350);
+      Utils.autoFocus(inputId);
+   }
+
+   private showToastrSuccess(title: string, msg: string) {
+      this.toastrService.success(title, msg, { closeButton: true, progressBar: true, timeOut: 2000 });
+   }
+
+   private showToastrError(title: string, msg: string) {
+      this.toastrService.error(title, msg, { closeButton: true, progressBar: true, timeOut: 2000 });
    }
 }

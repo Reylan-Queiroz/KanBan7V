@@ -8,15 +8,15 @@
             <small>{{ticket.ticketName}}</small>
             <small class="float-end">#{{ticket.ticketId}}</small>
          </div>
-         <div class="border border-top-0 rounded-bottom p-3" style="height: 75vh;">
+         <div class="border border-top-0 rounded-bottom p-3"><!--  style="height: 75vh;" -->
             <div class="row">
                <mat-form-field class="col-12">
                   <mat-chip-list #chipList>
-                     <mat-chip *ngFor="let member of ticket.assignedToPeople" ngDefaultControl [(ngModel)]="ticket.assignedToPeople" [selectable]="selectable" [removable]="removable" (removed)="removeChip(member)">
+                     <mat-chip *ngFor="let member of ticket.assignedToPeople" ngDefaultControl [(ngModel)]="ticket.assignedToPeople" [selectable]="matChipConfiguration.selectable" [removable]="matChipConfiguration.removable" (removed)="removeChip(member)">
                         {{member.peopleName}}
-                        <i class="fas fa-times mt-1" matChipRemove *ngIf="removable"></i>
+                        <i class="fas fa-times mt-1" matChipRemove *ngIf="matChipConfiguration.removable"></i>
                      </mat-chip>
-                     <input placeholder="Membros" #memberInput [formControl]="memberCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur" (matChipInputTokenEnd)="addChip($event)">
+                     <input placeholder="Membros" #memberInput [formControl]="memberCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="matChipConfiguration.addOnBlur" (matChipInputTokenEnd)="addChip($event)">
                   </mat-chip-list>
                   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedChip($event)">
                      <mat-option *ngFor="let member of filteredMembers | async" [value]="member.peopleId">
@@ -40,7 +40,7 @@
                            <input type="text" matInput placeholder="Escrever um comentário..." [formControl]="conversationCtrl" (keypress)="addConversation($event)">
                         </mat-form-field>
                      </div>
-                     <div class="col-12" style="height: 250px; overflow-x: hidden; overflow-y: auto;">
+                     <div class="col-12" style="overflow-x: hidden; overflow-y: auto;"><!-- height: 250px;  -->
                         <div class="row text-muted pt-3" *ngFor="let conversation of sortConversation">
                            <div class="col-9">
                               <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false">
@@ -48,7 +48,7 @@
                                  <rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text>
                               </svg>
 
-                              <span style="margin-right: 10px;">{{conversation.postedBy}}</span>
+                              <span style="margin-right: 10px;">{{conversation.postedBy.peopleName}}</span>
 
                               <span>{{conversation.dateTime | date: 'HH:mm dd/MMM'}}</span>
                            </div>
@@ -86,10 +86,10 @@
                <div class="rounded-top p-1 px-2" style="background-color: rgb(194, 199, 204);">
                   <small>Etiquetas</small>
                </div>
-               <div class="border border-top-0 rounded-bottom p-3" style="height: 75vh;">
+               <div class="border border-top-0 rounded-bottom p-3"> <!--  style="height: 75vh;" -->
                   <div class="row">
                      <div class="col-9 mb-3">
-                           <input type="text" class="form-control form-control-sm" placeholder="Digite para pesquisar..."  [(ngModel)]="tagFilter">
+                        <input type="text" class="form-control form-control-sm" placeholder="Digite para pesquisar..." [formControl]="searchTagCtrl">
                      </div>
                      <div class="col-3">
                         <button class="btn btn-sm btn-outline-dark w-100" id="btnCollapseAddTag" data-bs-toggle="collapse" data-bs-target="#collapseCreateTag" (click)="focusInput('inputTag')">
@@ -100,8 +100,8 @@
                         <input type="text" class="form-control form-control-sm" id="inputTag" placeholder="Insira o nome da etiqueta" maxlength="18" (keypress)="addNewTag($event)">
                      </div>
                      <div class="col-12">
-                        <!-- <small *ngIf="filteredTags.lenght === 0">Não há nenhuma etiqueta cadastrada.</small> -->
-                        <div *ngFor="let tag of filteredTags">
+                        <small *ngIf="filteredTags === undefined">Não há nenhuma etiqueta cadastrada.</small>
+                        <div *ngFor="let tag of filteredTags | async">
                            <mat-checkbox id="{{tag.tagId}}" [(ngModel)]="tag.tagChecked" (change)="addTagToTicket($event)">
                               <small>{{tag.tagName}}</small>
                            </mat-checkbox>

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GlobalConstants } from 'src/app/helpers/global-constants';
 import { CrudInterface } from '../interfaces/crud-interface';
+import { People } from '../models/people';
 
 @Injectable({
    providedIn: 'root'
@@ -15,7 +16,7 @@ export class MemberService implements CrudInterface {
    }
 
    getAll<T>() {
-      return this.http.get(`${GlobalConstants.apiURLMockoon}members`);
+      return this.http.get<People[]>(`${GlobalConstants.apiURLMockoon}members`);
    }
 
    getById<T>(id: number) {
