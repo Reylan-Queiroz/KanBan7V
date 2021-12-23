@@ -7,27 +7,27 @@ import { People } from '../models/people';
 @Injectable({
    providedIn: 'root'
 })
-export class MemberService implements CrudInterface {
+export class PeopleService implements CrudInterface {
 
    constructor(private http: HttpClient) { }
 
-   create<T>(obj: any) {
+   create(obj: any) {
       throw new Error('Method not implemented.');
    }
 
-   getAll<T>() {
-      return this.http.get<People[]>(`${GlobalConstants.apiURLMockoon}members`);
+   getAll() {
+      return this.http.get<People[]>(`${GlobalConstants.apiUrl}/People`);
    }
 
-   getById<T>(id: number) {
+   getById(id: number) {
       throw new Error('Method not implemented.');
    }
 
-   update<T>(id: number, obj: any) {
+   update(id: number, obj: any) {
       throw new Error('Method not implemented.');
    }
 
-   delete<T>(id: number) {
+   delete(id: number) {
       throw new Error('Method not implemented.');
    }
 }

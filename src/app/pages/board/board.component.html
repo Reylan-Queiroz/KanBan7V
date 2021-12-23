@@ -1,0 +1,112 @@
+<!-- <div class="box">
+   <div class="col-auto" style="padding-right: 0;">
+      <div class="wrapper" dragula="COLUMNS" [(dragulaModel)]="columnsAndTickets">
+         <div class="example-container rounded shadow-lg" *ngFor="let column of columnsAndTickets; let i = index">
+            <div class="mb-3 text-dark p-2 bg-light rounded-top">
+               <div class="row">
+                  <div class="col-9">
+                     <h5 class="group-handle" style="max-height: 24px;">
+                        <span contenteditable (blur)="editColumnName($event, column)">{{column.name}}</span>
+                     </h5>
+                  </div>
+                  <div class="col-3 dropend text-end">
+                     <button type="button" class="btn btn-sm">
+                        <i class="fas fa-ellipsis-h"></i>
+                     </button>
+                  </div>
+               </div>
+            </div>
+            <div id="ticketList" style="max-height: 68vh; overflow-y: auto; overflow-x: hidden;">
+               <div class="p-2 py-0" dragula="ITEMS" [(dragulaModel)]="column.tickets" style="min-height: 20px;" (dragulaModelChange)="moveTicket()">
+                  <div class="card text-dark bg-light mb-3 " [id]="ticket.id" *ngFor="let ticket of column.tickets">
+                     <div class="card-header px-2 py-1">
+                        <span class="small" contenteditable (blur)="editTicketName($event, ticket)">{{ticket.name}}</span>
+                        <span class="float-end" style="cursor: pointer;" (click)="openDialogEditTicket(ticket)">
+                           <i class="fas fa-edit" style="font-size: 15px"></i>
+                        </span>
+                     </div>
+                     <div class="card-body p-2" style="min-height: 40px; max-height: 85px;">
+                        <span class="card-text small">{{ (ticket.description.length > 90) ? (ticket.description | slice:0:87) + '...' : (ticket.description) }}</span>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="p-2 mt-3 pt-0">
+               <div class="collapse mb-3" id="{{'collapseCreateTicket' + i}}">
+                  <div class="card card-body">
+                     <form class="input-group " [formGroup]="formTicket">
+                        <input type="text" id="{{'inputTicket' + i}}" class="form-control form-control-sm" placeholder="Insira o nome do ticket" formControlName="nameTicket" (keydown.enter)="addTicket($event, column)">
+
+                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addTicket($event, column)" [disabled]="formTicket.invalid"><i class="fas fa-plus"></i></button>
+                     </form>
+                     <small class="text-danger mt-2" *ngIf="formTicket.controls.nameTicket.invalid && !formTicket.controls.nameTicket.pristine">
+                        <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>Este campo deve conter no mínimo 3 caracteres.
+                     </small>
+                  </div>
+               </div>
+
+               <button type="button" class="btn btn-sm btn-secondary w-100" id="{{'btnCollapse' + i}}" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapseCreateTicket' + i" aria-expanded="false" (click)="focusInput('inputTicket'+i)">
+                  <i class="fas text-light fa-plus-circle" style="margin-right: 15px;"></i>Adicionar Ticket
+               </button>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div style="padding-left: 0; width: 250px;">
+      <button type="button" class="btn btn-sm btn-secondary" id="btnCollapseAddColumn" data-bs-toggle="collapse" data-bs-target="#collapseCreateColumn" aria-expanded="false" (click)="inputColumn.focus()" style="width: 250px;">
+         <i class="fas fa-plus" style="margin-right: 15px;"></i>Adicionar outra lista
+      </button>
+
+      <div class="collapse mt-2" id="collapseCreateColumn">
+         <div class="card card-body">
+            <form class="input-group" [formGroup]="formColumn">
+               <input type="text" class="form-control form-control-sm" #inputColumn placeholder="Insira o nome da lista" maxlength="18" formControlName="nameColumn" (keydown.enter)="addColumn($event)">
+               <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addColumn($event)" [disabled]="formColumn.invalid"><i class="fas fa-plus"></i></button>
+            </form>
+            <small class="text-danger text-break mt-2" *ngIf="formColumn.controls.nameColumn.invalid && !formColumn.controls.nameColumn.pristine">
+               <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>Este campo deve conter entre 3 e 18 caracteres.<br>
+            </small>
+         </div>
+      </div>
+   </div>
+</div> -->
+
+<div *ngFor="let board of columnsAndTickets; let boardIndex = index;" class="board" cdkDropList [cdkDropListData]="board.tracks" (cdkDropListDropped)="onTrackDrop($event)" cdkDropListOrientation="horizontal">
+   <div cdkDrag class="card-list mat-elevation-z1" *ngFor="let track of board.tracks; let trackIndex = index;">
+      <div class="row" fxLayoutAlign="start center">
+         <h2 fxFlex="80" class="mat-h2"><span contenteditable [textContent]="track?.title" (input)="track.title=$event.target.textContent"></span></h2>
+         <div fxFlex="20" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" cdkDragHandle>
+            <!-- Filter Menu Starts Here-->
+            <button fxFlex="50" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+               <mat-icon>filter_list</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+               <button mat-menu-item (click)="filterByDate(track.talks, -1)">
+                  <mat-icon>arrow_downward</mat-icon>
+                  <span>Sort By(Date)</span>
+               </button>
+               <button mat-menu-item (click)="filterByDate(track.talks, 1)">
+                  <mat-icon>arrow_upward</mat-icon>
+                  <span>Sort By(Date)</span>
+               </button>
+            </mat-menu>
+            <button fxFlex="50" mat-icon-button aria-label="Example icon-button with a menu">
+               ASD
+            </button>
+         </div>
+      </div>
+
+      <!-- Filter Menu Ends Here-->
+
+      <div *ngIf="!track['collapsed']" class="card-list-content" cdkDropList [id]="track.id" [cdkDropListData]="track.talks" [cdkDropListConnectedTo]="trackIds(boardIndex)" (cdkDropListDropped)="onTalkDrop($event)">
+
+         <app-card *ngFor="let talk of track.talks" [text]="talk.text" [createdAt]="talk?.createdAt" [tags]="talk.tags" [issueType]="talk?.issueType" [author]="talk.speaker" [image]="talk.image" cdkDrag (edit)="addEditTalk(talk, track, true)" (delete)="deleteTalk(talk, track)"></app-card>
+
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="baseline baseline">
+         <button style="width: fit-content;" class="add-talk" (click)="addEditTalk(track, track)" color="primary" mat-raised-button>Add talk</button>
+         <span fxFlex style="text-align: right; cursor: pointer;" (click)="track['collapsed'] = !track['collapsed']">Click to {{ track['collapsed'] ? 'expand' : 'collapse'}}</span>
+      </div>
+   </div>
+</div>

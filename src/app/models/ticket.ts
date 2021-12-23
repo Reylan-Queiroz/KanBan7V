@@ -4,14 +4,20 @@ import { Tag } from "./tag";
 
 export class Ticket {
    constructor(
-      public ticketId: number,
-      public columnId: number,
-      public ticketName: string,
+      public id: number,
+      public name: string,
       public description: string,
       public creationDate: Date,
       public outletDate: Date,
+      public postedBy: People,
+      public position: number,
+
       public assignedToPeople: People[],
       public conversation: Conversation[],
-      public tagList: Tag[]
+      public tagList: Tag[],
+
+      // Foreing Keys
+      public columnId: number,
+      public postedById: number,
    ) { }
 }
