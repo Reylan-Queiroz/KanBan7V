@@ -1,4 +1,5 @@
 import { AppComponent } from './app.component';
+import { CardComponent } from './components/card/card.component';
 import { EditTicketComponent } from './components/dialogs/edit-ticket/edit-ticket.component';
 import { BoardComponent } from './pages/board/board.component';
 
@@ -7,24 +8,19 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
-import { DragulaModule } from 'ng2-dragula';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ToastrModule } from 'ngx-toastr';
 
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatInputModule } from '@angular/material/input';
-import { MatCheckboxModule, MatIconModule, MatMenuModule } from '@angular/material';
+import { MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatChipsModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSidenavModule, MatToolbarModule } from '@angular/material';
 
 @NgModule({
    declarations: [
       AppComponent,
       BoardComponent,
       EditTicketComponent,
+      CardComponent
    ],
    imports: [
       BrowserModule,
@@ -33,7 +29,6 @@ import { MatCheckboxModule, MatIconModule, MatMenuModule } from '@angular/materi
       FormsModule,
       ReactiveFormsModule,
       HttpClientModule,
-      DragulaModule.forRoot(),
       BrowserAnimationsModule,
       ToastrModule.forRoot(),
       DragDropModule,
@@ -45,7 +40,14 @@ import { MatCheckboxModule, MatIconModule, MatMenuModule } from '@angular/materi
       MatInputModule,
       MatIconModule,
       MatCheckboxModule,
-      MatMenuModule
+      MatMenuModule,
+      MatCardModule,
+      MatToolbarModule,
+      MatSidenavModule,
+      MatListModule,
+      MatButtonModule,
+      MatOptionModule,
+      MatSelectModule,
    ],
    entryComponents: [
       EditTicketComponent

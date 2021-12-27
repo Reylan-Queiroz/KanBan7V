@@ -16,32 +16,33 @@ import { Ticket } from 'src/app/models/ticket';
 import { Conversation } from 'src/app/models/conversation';
 import { PeopleService } from 'src/app/services/people.service';
 import { ConversationService } from 'src/app/services/conversation.service';
+import { Column } from 'src/app/models/column';
 
 @Component({
    selector: 'app-edit-ticket',
    templateUrl: './edit-ticket.component.html',
-   styleUrls: ['./edit-ticket.component.scss']
+   styleUrls: ['./edit-ticket.component.css']
 })
 export class EditTicketComponent implements OnInit {
-   public matChipConfiguration = { visible: true, selectable: true, removable: true, addOnBlur: false }
+   matChipConfiguration = { visible: true, selectable: true, removable: true, addOnBlur: false }
 
-   public description: string = this.ticket.description;
+   description: string = this.data.ticket.description;
 
-   public peopleCtrl = new FormControl();
-   public searchTagCtrl = new FormControl();
-   public conversationCtrl = new FormControl();
+   peopleCtrl = new FormControl();
+   searchTagCtrl = new FormControl();
+   conversationCtrl = new FormControl();
 
-   public separatorKeysCodes: number[] = [ENTER, COMMA];
+   separatorKeysCodes: number[] = [ENTER, COMMA];
 
    private allPeoples: any = [];
    private allTags: any = [];
 
-   public filteredPeople: Observable<People[]>;
-   public filteredTags: Observable<Tag[]>;
+   filteredPeople: Observable<People[]>;
+   filteredTags: Observable<Tag[]>;
 
-   public get sortConversation() {
-      if (this.ticket.conversation != null) {
-         return this.ticket.conversation.sort(
+   get sortConversation() {
+      if (this.data.ticket.conversation != null) {
+         return this.data.ticket.conversation.sort(
             (a, b) => {
                return <any>new Date(b.date) - <any>new Date(a.date);
             });
@@ -53,7 +54,7 @@ export class EditTicketComponent implements OnInit {
 
    constructor(
       private dialogRef: MatDialogRef<EditTicketComponent>,
-      @Inject(MAT_DIALOG_DATA) public ticket: Ticket,
+      @Inject(MAT_DIALOG_DATA) public data: { ticket: Ticket, column: Column },
 
       private toastrService: ToastrService,
       private peopleService: PeopleService,
@@ -80,14 +81,14 @@ export class EditTicketComponent implements OnInit {
       );
    }
 
-   public addChip(event: MatChipInputEvent) {
+   addChip(event: MatChipInputEvent) {
       const input = event.input;
       const value = event.value;
 
       if ((value || '').trim()) {
-         const peopleId = this.ticket.assignedToPeople.length + 1;
+         const peopleId = this.data.ticket.assignedToPeople.length + 1;
 
-         this.ticket.assignedToPeople.push(new People(peopleId, value));
+         this.data.ticket.assignedToPeople.push(new People(peopleId, value));
       }
 
       if (input) {
@@ -95,19 +96,19 @@ export class EditTicketComponent implements OnInit {
       }
    }
 
-   public removeChip(people: People) {
-      const index = this.ticket.assignedToPeople.indexOf(people);
+   removeChip(people: People) {
+      const index = this.data.ticket.assignedToPeople.indexOf(people);
 
       if (index >= 0) {
-         this.ticket.assignedToPeople.splice(index, 1);
+         this.data.ticket.assignedToPeople.splice(index, 1);
       }
    }
 
-   public selectedChip(event: MatAutocompleteSelectedEvent) {
-      const peopleId = this.ticket.assignedToPeople.length + 1;
+   selectedChip(event: MatAutocompleteSelectedEvent) {
+      const peopleId = this.data.ticket.assignedToPeople.length + 1;
       const peopleName = event.option.viewValue;
 
-      this.ticket.assignedToPeople.push(new People(peopleId, peopleName));
+      this.data.ticket.assignedToPeople.push(new People(peopleId, peopleName));
 
       this.peopleInput.nativeElement.value = '';
       this.peopleCtrl.setValue(null);
@@ -131,17 +132,17 @@ export class EditTicketComponent implements OnInit {
       );
    }
 
-   public addConversation(event: KeyboardEvent) {
+   addConversation(event: KeyboardEvent) {
       if (event.key === 'Enter') {
          const input: HTMLInputElement = (<HTMLInputElement>event.target);
          const conversationText: string = input.value;
 
          if ((conversationText || '').trim()) {
-            const conversation = new Conversation(0, conversationText, new Date(), null, 1, this.ticket.id);
+            const conversation = new Conversation(0, conversationText, new Date(), null, 1, this.data.ticket.id);
 
             this.conversationService.create(conversation).subscribe(
                () => {
-                  this.ticket.conversation.push(conversation);
+                  this.data.ticket.conversation.push(conversation);
                },
                (error: HttpErrorResponse) => {
                   this.showToastrError(error.message, '')
@@ -153,14 +154,14 @@ export class EditTicketComponent implements OnInit {
       }
    }
 
-   public addNewTag(event: KeyboardEvent) {
+   addNewTag(event: KeyboardEvent) {
       if (event.key === 'Enter') {
          const input: HTMLInputElement = (<HTMLInputElement>event.target);
          const tagText: string = input.value;
          const tagChecked: boolean = false;
 
          if ((tagText || '').trim()) {
-            this.ticket.tagList.push(new Tag(0, tagText, tagChecked));
+            this.data.ticket.tagList.push(new Tag(0, tagText, tagChecked));
 
             input.value = '';
             // Utils.clickButton('btnCollapseAddTag');
@@ -168,11 +169,11 @@ export class EditTicketComponent implements OnInit {
       }
    }
 
-   public addTagToTicket(event: MatCheckboxChange) {
+   addTagToTicket(event: MatCheckboxChange) {
       const tagId: number = Number.parseInt(event.source.id);
       const tagChecked: boolean = event.checked;
 
-      let tag: Tag = this.ticket.tagList.find(
+      let tag: Tag = this.data.ticket.tagList.find(
          (tag: Tag) =>
             tag.id === tagId
       );
@@ -180,7 +181,7 @@ export class EditTicketComponent implements OnInit {
       tag.checked = tagChecked;
    }
 
-   public focusInput(inputName: string) {
+   focusInput(inputName: string) {
       Utils.autoFocus(inputName);
    }
 
@@ -192,7 +193,7 @@ export class EditTicketComponent implements OnInit {
       this.toastrService.error(msg, title, { closeButton: true, progressBar: true, timeOut: 2000 });
    }
 
-   public switchToEdit(event: PointerEvent, index: number) {
+   switchToEdit(event: PointerEvent, index: number) {
       let element: HTMLElement = (<HTMLElement>document.getElementById('inp' + index));
       element.attributes.item(2).value = 'true';
 
@@ -205,7 +206,7 @@ export class EditTicketComponent implements OnInit {
       element.focus();
    }
 
-   public editConversationText(event: KeyboardEvent) {
+   editConversationText(event: KeyboardEvent) {
 
    }
 }

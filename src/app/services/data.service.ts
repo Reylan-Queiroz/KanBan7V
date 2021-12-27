@@ -6,7 +6,7 @@ import { GlobalConstants } from '../helpers/global-constants';
 @Injectable({
    providedIn: 'root'
 })
-export class ColumnsAndTicketsService {
+export class DataService {
 
    constructor(private http: HttpClient) { }
 

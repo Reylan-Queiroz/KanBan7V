@@ -1,18 +1,18 @@
 <div class="container">
    <div class="row">
       <div class="col-12 mb-3">
-         <span class="float-end" style="cursor: pointer" [mat-dialog-close]="ticket"><i class="fas fa-times"></i></span>
+         <span class="float-end" style="cursor: pointer" [mat-dialog-close]="data.ticket"><i class="fas fa-times"></i></span>
       </div>
       <div class="col-8 custom-hight">
          <div class="rounded-top p-1 px-2" style="background-color: rgb(194, 199, 204);">
-            <small>{{ticket.name}}</small>
-            <small class="float-end">#{{ticket.id}}</small>
+            <small>{{data.ticket.name}}</small>
+            <small class="float-end">#{{data.ticket.id}}</small>
          </div>
          <div class="border border-top-0 rounded-bottom p-3 h-100">
             <div class="row h-100">
                <mat-form-field class="col-12">
                   <mat-chip-list #chipList>
-                     <mat-chip *ngFor="let people of ticket.assignedToPeople" ngDefaultControl [(ngModel)]="ticket.assignedToPeople" [selectable]="matChipConfiguration.selectable" [removable]="matChipConfiguration.removable" (removed)="removeChip(people)">
+                     <mat-chip *ngFor="let people of data.ticket.assignedToPeople" ngDefaultControl [(ngModel)]="data.ticket.assignedToPeople" [selectable]="matChipConfiguration.selectable" [removable]="matChipConfiguration.removable" (removed)="removeChip(people)">
                         {{people.name}}
                         <i class="fas fa-times mt-1" matChipRemove *ngIf="matChipConfiguration.removable"></i>
                      </mat-chip>
@@ -26,7 +26,7 @@
                </mat-form-field>
 
                <mat-form-field class="col-12 mt-1">
-                  <textarea matInput placeholder="Descrição" [(ngModel)]="description" style="resize: none;">{{ticket.description}}</textarea>
+                  <textarea matInput placeholder="Descrição" [(ngModel)]="description" style="resize: none;">{{data.ticket.description}}</textarea>
                </mat-form-field>
 
                <div class="col-12 mt-1">
