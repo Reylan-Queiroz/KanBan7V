@@ -32,6 +32,10 @@
    filter: alpha(opacity=20);
 }
 
-.trend-dialog .mat-dialog-container{
+.trend-dialog .mat-dialog-container {
    overflow-y: hidden !important;
+}
+
+.form-danger {
+   border: 2px solid #ff0000 !important;
 }

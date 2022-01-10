@@ -1,12 +1,14 @@
+import { Observable } from 'rxjs';
+import { GlobalConstants } from './../helpers/global-constants';
 import { HttpClient } from '@angular/common/http';
+import { CrudInterface } from './../interfaces/crud-interface';
 import { Injectable } from '@angular/core';
-import { GlobalConstants } from 'src/app/helpers/global-constants';
-import { CrudInterface } from '../interfaces/crud-interface';
+import { Board } from '../models/board';
 
 @Injectable({
    providedIn: 'root'
 })
-export class PeopleService implements CrudInterface {
+export class BoardService implements CrudInterface {
 
    constructor(private http: HttpClient) { }
 
@@ -15,7 +17,7 @@ export class PeopleService implements CrudInterface {
    }
 
    getAll() {
-      return this.http.get(`${GlobalConstants.apiUrl}/People`);
+      return this.http.get<Observable<Board[]>>(`${GlobalConstants.apiUrl}/Board`)
    }
 
    getById(id: number) {

@@ -1,0 +1,6 @@
+Tem certeza que deseja excluir "{{data.ticket.title}}"?
+
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="false">Cancelar</button>
+  <button cdkFocusInitial mat-button (click)="delete()">Deletar</button>
+</mat-dialog-actions>

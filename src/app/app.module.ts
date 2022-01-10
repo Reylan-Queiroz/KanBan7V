@@ -1,7 +1,12 @@
+import { DrawerComponent } from './components/drawer/drawer.component';
+import { BoardComponent } from './pages/board/board.component';
+import { KanbanComponent } from './pages/kanban/kanban.component';
+import { LoginComponent } from './pages/login/login.component';
 import { AppComponent } from './app.component';
 import { CardComponent } from './components/card/card.component';
+import { AddTicketComponent } from './components/dialogs/add-ticket/add-ticket.component';
 import { EditTicketComponent } from './components/dialogs/edit-ticket/edit-ticket.component';
-import { BoardComponent } from './pages/board/board.component';
+import { DeleteTicketComponent } from './components/dialogs/delete-ticket/delete-ticket.component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
@@ -18,9 +23,16 @@ import { MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModul
 @NgModule({
    declarations: [
       AppComponent,
+      KanbanComponent,
+      LoginComponent,
       BoardComponent,
+
+      CardComponent,
+      DrawerComponent,
+
       EditTicketComponent,
-      CardComponent
+      AddTicketComponent,
+      DeleteTicketComponent
    ],
    imports: [
       BrowserModule,
@@ -50,7 +62,9 @@ import { MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModul
       MatSelectModule,
    ],
    entryComponents: [
-      EditTicketComponent
+      EditTicketComponent,
+      AddTicketComponent,
+      DeleteTicketComponent
    ],
    providers: [],
    bootstrap: [AppComponent]

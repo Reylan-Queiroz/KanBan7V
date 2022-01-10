@@ -23,7 +23,7 @@ export class ConversationService implements CrudInterface {
    }
 
    update(id: number, obj: any) {
-      throw new Error('Method not implemented.');
+      return this.http.put(`${GlobalConstants.apiUrl}/Conversation/${id}`, obj);
    }
 
    delete(id: number) {

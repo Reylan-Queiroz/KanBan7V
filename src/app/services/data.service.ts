@@ -11,6 +11,7 @@ export class DataService {
    constructor(private http: HttpClient) { }
 
    get() {
+      //return this.http.get<any>(`http://localhost:3001/Kanban`);
       return this.http.get<any>(`${GlobalConstants.apiUrl}/Kanban`);
    }
 }

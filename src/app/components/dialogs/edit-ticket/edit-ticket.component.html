@@ -5,7 +5,7 @@
       </div>
       <div class="col-8 custom-hight">
          <div class="rounded-top p-1 px-2" style="background-color: rgb(194, 199, 204);">
-            <small>{{data.ticket.name}}</small>
+            <small>{{data.ticket.title}}</small>
             <small class="float-end">#{{data.ticket.id}}</small>
          </div>
          <div class="border border-top-0 rounded-bottom p-3 h-100">
@@ -13,20 +13,20 @@
                <mat-form-field class="col-12">
                   <mat-chip-list #chipList>
                      <mat-chip *ngFor="let people of data.ticket.assignedToPeople" ngDefaultControl [(ngModel)]="data.ticket.assignedToPeople" [selectable]="matChipConfiguration.selectable" [removable]="matChipConfiguration.removable" (removed)="removeChip(people)">
-                        {{people.name}}
+                        {{people?.name}}
                         <i class="fas fa-times mt-1" matChipRemove *ngIf="matChipConfiguration.removable"></i>
                      </mat-chip>
                      <input placeholder="Membros" #peopleInput [formControl]="peopleCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="matChipConfiguration.addOnBlur" (matChipInputTokenEnd)="addChip($event)">
                   </mat-chip-list>
                   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedChip($event)">
-                     <mat-option *ngFor="let people of filteredPeople | async" [value]="people.id">
-                        {{people.name}}
+                     <mat-option *ngFor="let people of filteredPeople$ | async" [value]="people?.id">
+                        {{people?.name}}
                      </mat-option>
                   </mat-autocomplete>
                </mat-form-field>
 
                <mat-form-field class="col-12 mt-1">
-                  <textarea matInput placeholder="Descrição" [(ngModel)]="description" style="resize: none;">{{data.ticket.description}}</textarea>
+                  <textarea matInput placeholder="Descrição" [(ngModel)]="description" style="resize: none;" (blur)="addOrEditDescription($event, description)">{{data.ticket.description}}</textarea>
                </mat-form-field>
 
                <div class="col-12 mt-1">
@@ -36,7 +36,7 @@
                   <div class="border border-top-0 rounded-bottom p-3">
                      <div class="row">
                         <mat-form-field class="col-12">
-                           <input type="text" matInput placeholder="Escrever um comentário..." [formControl]="conversationCtrl" (keypress)="addConversation($event)">
+                           <input type="text" matInput placeholder="Escrever um comentário..." (keydown.enter)="addConversation($event)">
                         </mat-form-field>
                         <div class="col-12 comments-div">
                            <div class="row text-muted pt-3" *ngFor="let conversation of sortConversation; let i = index">
@@ -48,26 +48,33 @@
 
                                  <span style="margin-right: 10px;">{{conversation.postedBy?.name}}</span>
 
-                                 <span>{{conversation.date | date: 'HH:mm dd/MMM'}}</span>
+                                 <span>{{conversation.date | date: 'HH:mm dd/MMM' }}</span>
                               </div>
 
                               <div class="col-3 text-end">
                                  <div class="btn-group btn-group-sm" role="group">
-                                    <button type="button" class="btn" (click)="switchToEdit($event, i)">
+                                    <button type="button" class="btn" [id]="'btnEdit' + i" (click)="switchToEditMode($event, i)">
                                        <i class="fas fa-pencil-alt"></i>
                                     </button>
-                                    <button type="button" class="btn" (click)="fileInput.click()">
+                                    <button type="button" class="btn" [id]="'btnFile' + i" (click)="fileInput.click()">
                                        <span><i class="fas fa-paperclip"></i></span>
-                                       <input #fileInput type="file" style="display:none;" /> <!-- (change)="onFileInput($event)" -->
+                                       <input type="file" class="d-none" #fileInput /> <!-- (change)="onFileInput($event)" -->
                                     </button>
-                                    <button type="button" class="btn">
+                                    <button type="button" class="btn" [id]="'btnDownload' + i">
                                        <i class="fas fa-download"></i>
+                                    </button>
+
+                                    <button type="button" class="btn d-none" [id]="'btnConfirm' + i" (click)="confirmTheEdit(conversation, i)">
+                                       <i class="fas fa-check"></i>
+                                    </button>
+                                    <button type="button" class="btn d-none" [id]="'btnCancel' + i" (click)="cancelTheEdit(i)">
+                                       <i class="fas fa-times"></i>
                                     </button>
                                  </div>
                               </div>
 
                               <div class="col-12">
-                                 <p class="mb-0  text-break overflow-auto" [id]="'inp' + i" contenteditable="false" (keypress)="editConversationText($event)">{{conversation.text}}</p>
+                                 <p class="mb-0 text-break overflow-auto" contenteditable="false" [id]="'inp' + i">{{conversation.text}}</p>
                               </div>
                            </div>
                         </div>
@@ -75,7 +82,7 @@
                   </div>
                </div>
                <div class="col-12 mt-2">
-                  <small class="text-muted">Criado pôr: Reylanpiano</small>
+                  <small class="text-muted">Criado pôr: {{data.ticket.postedBy?.name}}</small>
                </div>
             </div>
          </div>
@@ -92,16 +99,15 @@
                         <input type="text" class="form-control form-control-sm" placeholder="Digite para pesquisar..." [formControl]="searchTagCtrl">
                      </div>
                      <div class="col-3">
-                        <button class="btn btn-sm btn-outline-dark w-100" id="btnCollapseAddTag" data-bs-toggle="collapse" data-bs-target="#collapseCreateTag" (click)="focusInput('inputTag')">
+                        <button class="btn btn-sm btn-outline-dark w-100" id="btnCollapseAddTag" data-bs-toggle="collapse" data-bs-target="#collapseCreateTag" (click)="inputTag.focus()">
                            <i class="fas fa-plus"></i>
                         </button>
                      </div>
                      <div class="collapse col-12 mb-3" id="collapseCreateTag">
-                        <input type="text" class="form-control form-control-sm" id="inputTag" placeholder="Insira o nome da etiqueta" maxlength="18" (keypress)="addNewTag($event)">
+                        <input type="text" class="form-control form-control-sm" #inputTag placeholder="Insira o nome da etiqueta" maxlength="18" (keydown.enter)="addNewTag($event)">
                      </div>
                      <div class="col-12">
-                        <small *ngIf="filteredTags === undefined">Não há nenhuma etiqueta cadastrada.</small>
-                        <div *ngFor="let tag of filteredTags | async">
+                        <div *ngFor="let tag of filteredTags$ | async">
                            <mat-checkbox id="{{tag?.id}}" [(ngModel)]="tag.checked" (change)="addTagToTicket($event)">
                               <small>{{tag?.name}}</small>
                            </mat-checkbox>

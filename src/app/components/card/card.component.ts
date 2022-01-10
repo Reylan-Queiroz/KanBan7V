@@ -1,3 +1,4 @@
+import { Ticket } from 'src/app/models/ticket';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
@@ -6,18 +7,10 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
    styleUrls: ['./card.component.scss']
 })
 export class CardComponent implements OnInit {
-
-   // issueTypesWithColor = appConstants.issueTypeListWithColor;
-   // issueTypes = Object.values(IssueType);
    @Output() edit = new EventEmitter<void>();
    @Output() delete = new EventEmitter<void>();
 
-   @Input() text: string;
-   @Input() author: string;
-   @Input() tags: [];
-   @Input() image: string;
-   @Input() issueType?: string;
-   @Input() createdAt: Date;
+   @Input() ticket: Ticket;
 
    constructor() { }
 

@@ -1,8 +1,8 @@
+import { GlobalConstants } from 'src/app/helpers/global-constants';
 import { Ticket } from 'src/app/models/ticket';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CrudInterface } from '../interfaces/crud-interface';
-import { GlobalConstants } from '../helpers/global-constants';
 
 @Injectable({
    providedIn: 'root'
@@ -28,6 +28,6 @@ export class TicketService implements CrudInterface {
    }
 
    delete(id: number) {
-      throw new Error('Method not implemented.');
+      return this.http.delete<Ticket>(`${GlobalConstants.apiUrl}/Ticket/${id}`);
    }
 }

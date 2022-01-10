@@ -1,32 +1,14 @@
-<div *ngFor="let board of data; let boardIndex = index;" class="board" cdkDropList [cdkDropListData]="board.columnsAndTickets" (cdkDropListDropped)="onTrackDrop($event)" cdkDropListOrientation="horizontal">
-   <div cdkDrag class="card-list mat-elevation-z1" *ngFor="let column of board.columnsAndTickets; let trackIndex = index;">
-      <div class="row" fxLayoutAlign="start center">
-         <div class="col-8">
-            <h2 fxFlex="80" class="mat-h2"><span contenteditable [textContent]="column?.name" (input)="column.name=$event.target.textContent"></span></h2>
-         </div>
-         <div class="col-4 text-end">
-            <div cdkDragHandle>
-               <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
-                  <mat-icon>filter_list</mat-icon>
-               </button>
-               <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="filterByDate(null, -1)">
-                     <mat-icon>arrow_downward</mat-icon>
-                     <span>Sort By(Date)</span>
-                  </button>
-                  <button mat-menu-item (click)="filterByDate(null, 1)">
-                     <mat-icon>arrow_upward</mat-icon>
-                     <span>Sort By(Date)</span>
-                  </button>
-               </mat-menu>
-               <button mat-icon-button>
-                  <mat-icon>drag_handle</mat-icon>
-               </button>
-            </div>
-         </div>
+<div class="container mt-3" style="height: 91vh;">
+   <div class="row">
+      <div class="col-12">
+         <h3>Quadros:</h3>
       </div>
-      <div *ngIf="!column['collapsed']" class="card-list-content" cdkDropList [id]="column.id" [cdkDropListData]="column.tickets" [cdkDropListConnectedTo]="trackIds(boardIndex)" (cdkDropListDropped)="onTalkDrop($event)">
-         <app-card *ngFor="let ticket of column.tickets" [text]="ticket.name" cdkDrag (edit)="openDialogEditTicket(ticket, column, true)" (delete)="deleteTalk(ticket, column)"></app-card>
+      <div class="col-3 mt-2" *ngFor="let board of boards$ | async">
+         <mat-card class="shadow board-item" (click)="navigate()">
+            <mat-card-header>
+               <mat-card-title>{{board.name}}</mat-card-title>
+            </mat-card-header>
+         </mat-card>
       </div>
    </div>
 </div>

@@ -1,18 +1,12 @@
 <mat-card class="card-ticket">
-   <!-- [style.backgroundColor]="issueTypesWithColor[issueType]?.color" -->
-   <!-- mat-card allows us to optionally provide a card image. -->
-   <!-- <img *ngIf="image" mat-card-image [src]="image" draggable="false"> -->
-
-   <!-- Use the mat-card-content to add the proper spacing. -->
    <mat-card-content>
-      {{text}}
-      <!-- <div *ngIf="author">By: {{author}}</div> -->
-
-      <div *ngIf="tags">
+      <p>{{ticket.title}}</p>
+      <span class="card-text small">{{ (ticket.description.length > 90) ? (ticket.description | slice:0:87) + '...' : (ticket.description) }}</span>
+      <!-- <div *ngIf="tags">
          <mat-chip-list>
             <mat-chip [style.background]="tag?.color ? tag.color : '#e0e0e0'" *ngFor="let tag of tags" selectable="false">{{tag?.name}}</mat-chip>
          </mat-chip-list>
-      </div>
+      </div> -->
 
       <mat-icon (click)="delete.next()" class="icon">cancel_outline</mat-icon>
    </mat-card-content>

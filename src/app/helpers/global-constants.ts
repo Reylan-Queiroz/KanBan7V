@@ -1,5 +1,7 @@
 export class GlobalConstants {
-   public static apiUrlMockoon: string = "http://localhost:3004";
    public static apiUrl: string = "http://192.168.0.101:5091/api/v1";
-   public static apiUrlLocalHost: string = "https://localhost:44330/api/v1";
+   public static toastrConfig = { closeButton: true, progressBar: true, timeOut: 2000 };
+
+   public static kanbanUser = 'kanbanuser';
+   public static kanbanToken = 'kanbantoken';
 }

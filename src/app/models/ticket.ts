@@ -5,7 +5,7 @@ import { Tag } from "./tag";
 export class Ticket {
    constructor(
       public id: number,
-      public name: string,
+      public title: string,
       public description: string,
       public creationDate: Date,
       public outletDate: Date,
@@ -13,11 +13,11 @@ export class Ticket {
       public position: number,
 
       public assignedToPeople: People[],
-      public conversation: Conversation[],
-      public tagList: Tag[],
+      public conversations: Conversation[],
+      public tags: Tag[],
 
       // Foreing Keys
-      public columnId: number,
+      public columnId: any,
       public postedById: number,
    ) { }
 }

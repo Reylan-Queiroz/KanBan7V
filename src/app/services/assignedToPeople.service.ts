@@ -1,21 +1,21 @@
+import { GlobalConstants } from './../helpers/global-constants';
 import { HttpClient } from '@angular/common/http';
+import { CrudInterface } from './../interfaces/crud-interface';
 import { Injectable } from '@angular/core';
-import { GlobalConstants } from 'src/app/helpers/global-constants';
-import { CrudInterface } from '../interfaces/crud-interface';
 
 @Injectable({
    providedIn: 'root'
 })
-export class PeopleService implements CrudInterface {
+export class AssignedToPeopleService implements CrudInterface {
 
    constructor(private http: HttpClient) { }
 
    create(obj: any) {
-      throw new Error('Method not implemented.');
+      return this.http.post(`${GlobalConstants.apiUrl}/AssignedToPeople/Create`, obj);
    }
 
    getAll() {
-      return this.http.get(`${GlobalConstants.apiUrl}/People`);
+      throw new Error('Method not implemented.');
    }
 
    getById(id: number) {
@@ -27,6 +27,6 @@ export class PeopleService implements CrudInterface {
    }
 
    delete(id: number) {
-      throw new Error('Method not implemented.');
+      return this.http.delete(`${GlobalConstants.apiUrl}/AssignedToPeople/${id}`);
    }
 }

@@ -1,0 +1,53 @@
+<div class="board" *ngFor="let board of data; let boardIndex = index;" cdkDropList cdkDropListOrientation="horizontal" [cdkDropListData]="board.columnsAndTickets" (cdkDropListDropped)="onColumnDrop($event)">
+   <div cdkDrag class="card-list mat-elevation-z1" *ngFor="let column of board.columnsAndTickets;">
+      <div class="row" fxLayoutAlign="start center">
+         <div class="col-8">
+            <h2 fxFlex="80" class="mat-h2">
+               <span contenteditable [textContent]="column?.title" (blur)="editColumnName($event, column)"></span>
+            </h2>
+         </div>
+         <div class="col-4 text-end">
+            <div cdkDragHandle>
+               <button mat-icon-button [matMenuTriggerFor]="menu">
+                  <mat-icon>filter_list</mat-icon>
+               </button>
+               <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="filterByDate(null, -1)">
+                     <mat-icon>arrow_downward</mat-icon>
+                     <span>Sort By(Date)</span>
+                  </button>
+                  <button mat-menu-item (click)="filterByDate(null, 1)">
+                     <mat-icon>arrow_upward</mat-icon>
+                     <span>Sort By(Date)</span>
+                  </button>
+               </mat-menu>
+               <button mat-icon-button>
+                  <mat-icon>drag_handle</mat-icon>
+               </button>
+            </div>
+         </div>
+      </div>
+      <div *ngIf="!column['collapsed']" class="card-list-content" cdkDropList [id]="column.id" [cdkDropListData]="column.tickets" [cdkDropListConnectedTo]="connectedToIds(boardIndex)" (cdkDropListDropped)="onTicketDrop($event)">
+         <app-card *ngFor="let ticket of column.tickets" cdkDrag [ticket]="ticket" [id]="ticket.id" (edit)="openDialogEditTicket(ticket, column)" (delete)="openDialogDeleteTicket(ticket, column)"></app-card>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="baseline baseline">
+         <button class="add-talk" color="primary" mat-raised-button style="width: fit-content;" (click)="openDialogAddTicket(column)">Adicionar Ticket</button>
+      </div>
+   </div>
+   <div style="padding-left: 0; width: 250px;">
+      <button type="button" mat-raised-button id="btnCollapseAddColumn" data-bs-toggle="collapse" data-bs-target="#collapseCreateColumn" aria-expanded="false" style="width: 250px;" (click)="inputColumn.focus()">
+         <i class="fas fa-plus" style="margin-right: 15px;"></i>Adicionar outra lista
+      </button>
+      <div class="collapse mt-2" id="collapseCreateColumn">
+         <div class="card card-body">
+            <form class="input-group" [formGroup]="formColumn">
+               <input type="text" class="form-control form-control-sm" #inputColumn placeholder="Insira o nome da lista" maxlength="18" formControlName="nameColumn" (keydown.enter)="addColumn($event)">
+               <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addColumn($event)" [disabled]="formColumn.invalid"><i class="fas fa-plus"></i></button>
+            </form>
+            <small class="text-danger text-break mt-2" *ngIf="formColumn.controls.nameColumn.invalid && !formColumn.controls.nameColumn.pristine">
+               <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>Este campo deve conter entre 3 e 18 caracteres.<br>
+            </small>
+         </div>
+      </div>
+   </div>
+</div>
