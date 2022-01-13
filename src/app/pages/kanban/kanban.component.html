@@ -28,10 +28,10 @@
          </div>
       </div>
       <div *ngIf="!column['collapsed']" class="card-list-content" cdkDropList [id]="column.id" [cdkDropListData]="column.tickets" [cdkDropListConnectedTo]="connectedToIds(boardIndex)" (cdkDropListDropped)="onTicketDrop($event)">
-         <app-card *ngFor="let ticket of column.tickets" cdkDrag [ticket]="ticket" [id]="ticket.id" (edit)="openDialogEditTicket(ticket, column)" (delete)="openDialogDeleteTicket(ticket, column)"></app-card>
+         <app-card *ngFor="let ticket of column.tickets" cdkDrag [ticket]="ticket" [id]="ticket.id" [tags]="ticket.tags" (edit)="openEditTicketDialog(ticket, column)" (delete)="openDeleteTicketDialog(ticket, column)"></app-card>
       </div>
       <div fxLayout="row" fxLayoutAlign="baseline baseline">
-         <button class="add-talk" color="primary" mat-raised-button style="width: fit-content;" (click)="openDialogAddTicket(column)">Adicionar Ticket</button>
+         <button class="add-talk" color="primary" mat-raised-button style="width: fit-content;" (click)="openAddTicketDialog(column)">Adicionar Ticket</button>
       </div>
    </div>
    <div style="padding-left: 0; width: 250px;">

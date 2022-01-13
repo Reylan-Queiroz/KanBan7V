@@ -6,6 +6,7 @@ import { Column } from 'src/app/models/column';
 import { Ticket } from 'src/app/models/ticket';
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
    selector: 'app-delete-ticket',

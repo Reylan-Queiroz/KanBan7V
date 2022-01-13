@@ -1,12 +1,13 @@
+import { AddTagComponent } from './../../add-tag/add-tag.component';
 import { User } from 'src/app/models/user';
-import { TicketTagsService } from './../../../services/ticketTags.service';
-import { AssignedToPeopleService } from './../../../services/assignedToPeople.service';
+import { TicketTagsService } from '../../../../services/ticketTags.service';
+import { AssignedToPeopleService } from '../../../../services/assignedToPeople.service';
 import { TicketService } from 'src/app/services/ticket.service';
 import { GlobalConstants } from 'src/app/helpers/global-constants';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatCheckboxChange } from '@angular/material';
@@ -21,6 +22,8 @@ import { Conversation } from 'src/app/models/conversation';
 import { PeopleService } from 'src/app/services/people.service';
 import { ConversationService } from 'src/app/services/conversation.service';
 import { Column } from 'src/app/models/column';
+import { BehaviorSubject } from 'rxjs';
+import { ColorPickerComponent } from '../../color-picker/color-picker.component';
 
 @Component({
    selector: 'app-edit-ticket',
@@ -28,23 +31,23 @@ import { Column } from 'src/app/models/column';
    styleUrls: ['./edit-ticket.component.scss']
 })
 export class EditTicketComponent implements OnInit {
-   private wasChange: any = undefined;
+   private wasChanged = new BehaviorSubject<boolean>(false);
+   public changed = false;
 
    matChipConfiguration = { visible: true, selectable: true, removable: true, addOnBlur: false }
 
-   ticket: Ticket = this.data.ticket;
-   description: string = this.ticket.description;
+   description: string = this.data.ticket.description;
 
    peopleCtrl = new FormControl();
    searchTagCtrl = new FormControl();
 
    separatorKeysCodes: number[] = [ENTER, COMMA];
 
-   private allPeoples: any = [];
+   private allPeoples: any[] = [];
    private allTags: any = [];
 
-   filteredPeople$: Observable<People[]>;
-   filteredTags$: Observable<Tag[]>;
+   filteredPeople$: Observable<any[]>;
+   filteredTags$: Observable<any[]>;
 
    get sortConversation() {
       if (this.data.ticket.conversations != null) {
@@ -59,6 +62,7 @@ export class EditTicketComponent implements OnInit {
 
    constructor(
       private dialogRef: MatDialogRef<EditTicketComponent>,
+      private matDialog: MatDialog,
       @Inject(MAT_DIALOG_DATA) public data: { ticket: Ticket, column: Column, user: User },
 
       private toastrService: ToastrService,
@@ -73,6 +77,8 @@ export class EditTicketComponent implements OnInit {
    async ngOnInit() {
       await this.loadData();
 
+      this.wasChanged.subscribe(async changed => changed === true ? await this.loadData() : '');
+
       this.filteredPeople$ = this.peopleCtrl.valueChanges.pipe(
          startWith(null),
          map((name: string | null) =>
@@ -84,24 +90,66 @@ export class EditTicketComponent implements OnInit {
          map((name: string | null) =>
             name ? this.filterTag(name) : this.allTags.slice()
          ));
-
-      this.dialogRef.backdropClick().subscribe(
-         () => {
-            this.dialogRef.close(this.wasChange);
-         }
-      );
    }
 
    private async loadData() {
-      this.allPeoples = await this.peopleService.getAll().toPromise();
-      this.allTags = await this.tagService.getAll().toPromise();
+      let ticketTags = [];
+      let conversations = [];
+      let assignedToPeople = []
 
-      this.ticket.tags.forEach(tags => {
-         this.allTags.forEach(allTags => {
-            if (tags.id === allTags.id) {
-               allTags.checked = true;
-            }
-         });
+      this.data.ticket.assignedToPeople = [];
+      this.data.ticket.conversations = [];
+
+      await this.peopleService.getAll()
+         .toPromise()
+         .then((response: any) => {
+            this.allPeoples = response;
+         }).catch(error => console.log(error));
+
+      await this.tagService.getAll()
+         .toPromise()
+         .then((response: any) => {
+            this.allTags = response;
+         }).catch(error => console.log(error));
+
+      await this.assignedToPeopleService.getAll()
+         .toPromise()
+         .then((response: any) => {
+            assignedToPeople = response;
+         }).catch(error => console.log(error));
+
+      await this.conversationService.getAll()
+         .toPromise()
+         .then((response: any) => {
+            conversations = response;
+         }).catch(error => console.log(error));
+
+      await this.ticketTagsService.getAll()
+         .toPromise()
+         .then((response: any) => {
+            ticketTags = response;
+         }).catch(error => console.log(error));
+
+      ticketTags.forEach(element => {
+         if (element.ticketId !== this.data.ticket.id) { return; }
+
+         let tag = this.allTags.find(el => el.id === element.tagId);
+         tag.checked = true;
+         tag.ticketTagsId = element.id;
+      });
+
+      conversations.forEach((conversation: Conversation) => {
+         if (conversation.ticketId !== this.data.ticket.id) { return; }
+
+         conversation.postedBy = this.allPeoples.find(el => el.id === conversation.postedById);
+         this.data.ticket.conversations.push(conversation);
+      });
+
+      assignedToPeople.forEach(element => {
+         if (element.ticketId !== this.data.ticket.id) { return; }
+
+         let people: People = this.allPeoples.find(el => el.id === element.peopleId);
+         this.data.ticket.assignedToPeople.push(people);
       });
    }
 
@@ -120,11 +168,10 @@ export class EditTicketComponent implements OnInit {
    removeChip(people: People) {
       const index = this.data.ticket.assignedToPeople.indexOf(people);
 
-      let ticket: any = this.ticket;
+      let ticket: any = this.data.ticket;
 
       this.assignedToPeopleService.delete(ticket.assignedToPeopleId).subscribe(
          () => {
-            this.wasChange = true;
             this.data.ticket.assignedToPeople.splice(index, 1);
          },
          (error: HttpErrorResponse) => { console.log(error); }
@@ -135,12 +182,12 @@ export class EditTicketComponent implements OnInit {
       const id = event.option.value;
       const name = event.option.viewValue;
 
-      this.data.ticket.assignedToPeople.push(new People(Number.parseInt(id), name));
+      this.data.ticket.assignedToPeople.push(new People(id, name));
 
-      const obj = { id: 0, peopleId: id, ticketId: this.ticket.id };
+      const obj = { id: 0, peopleId: id, ticketId: this.data.ticket.id };
 
       this.assignedToPeopleService.create(obj).subscribe(
-         () => { this.wasChange = true; },
+         () => { },
          (error: HttpErrorResponse) => { console.log(error); }
       );
 
@@ -157,19 +204,19 @@ export class EditTicketComponent implements OnInit {
    }
 
    addOrEditDescription(event: FocusEvent, description: string) {
-      if (description === this.ticket.description) { return; }
+      if (description === this.data.ticket.description) { return; }
 
-      this.ticket.description = description;
+      this.data.ticket.description = description;
 
-      this.ticketService.update(this.ticket.id, this.ticket).subscribe(
-         () => { this.wasChange = true; },
+      this.ticketService.update(this.data.ticket.id, this.data.ticket).subscribe(
+         () => { },
          (error: HttpErrorResponse) => { console.log(error); }
       );
    }
 
    addConversation(event: KeyboardEvent) {
       const input: HTMLInputElement = (<HTMLInputElement>event.target);
-      const id: number = this.ticket.conversations.length + 1;
+      const id: number = this.data.ticket.conversations.length + 1;
       const text: string = input.value;
 
       if ((text || '').trim()) {
@@ -178,11 +225,10 @@ export class EditTicketComponent implements OnInit {
 
          this.conversationService.create(conversation).subscribe(
             () => {
-               this.wasChange = true;
                this.data.ticket.conversations.push(conversation);
             },
             (error: HttpErrorResponse) => {
-               this.toastrService.error(error.message, '', GlobalConstants.toastrConfig)
+               this.toastrService.error(error.message, '', GlobalConstants.toastrConfig);
             }
          );
 
@@ -242,7 +288,6 @@ export class EditTicketComponent implements OnInit {
 
       this.conversationService.update(conversation.id, conversation).subscribe(
          () => {
-            this.wasChange = true;
             this.toastrService.success('Sucesso!', '', GlobalConstants.toastrConfig);
          },
          (error: HttpErrorResponse) => {
@@ -263,25 +308,7 @@ export class EditTicketComponent implements OnInit {
       );
    }
 
-   addNewTag(event: KeyboardEvent) {
-      const input: HTMLInputElement = (<HTMLInputElement>event.target);
-      const id: number = this.allTags.length + 1;
-      const name: string = input.value;
-      const checked: boolean = false;
-
-      if ((name || '').trim()) {
-         const tag = new Tag(id, name, checked);
-
-         this.tagService.create(tag).subscribe(
-            () => { this.wasChange = true; },
-            (error: HttpErrorResponse) => { console.log(error); }
-         );
-
-         input.value = '';
-      }
-   }
-
-   addTagToTicket(event: MatCheckboxChange) {
+   addTagToTicket(event: MatCheckboxChange, ticketTagsId: number) {
       const id: number = Number.parseInt(event.source.id);
 
       let tag: Tag = this.allTags.find((tag: Tag) =>
@@ -290,11 +317,48 @@ export class EditTicketComponent implements OnInit {
 
       if (!tag) { return; }
 
-      const obj = { id: 0, tagId: tag.id, ticketId: this.ticket.id };
+      if (event.checked === false) {
+         this.ticketTagsService.delete(ticketTagsId).subscribe(
+            () => {
+               this.changed = true;
+            },
+            (error: HttpErrorResponse) => { console.log(error); }
+         );
+
+         return;
+      }
+
+      const obj = { id: 0, tagId: tag.id, ticketId: this.data.ticket.id };
 
       this.ticketTagsService.create(obj).subscribe(
-         () => { this.wasChange = true; },
+         () => {
+            this.changed = true;
+         },
          (error: HttpErrorResponse) => { console.log(error); }
       );
+   }
+
+   openColorPickerDialog(tag): void {
+      const dialogRef = this.matDialog.open(ColorPickerComponent, {
+         // width: '250px',
+         data: {},
+         disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+         console.log(result);
+         if (result) {
+            tag.color = result;
+         }
+      });
+   }
+
+   openAddTagDialog() {
+      const dialogRef = this.matDialog.open(AddTagComponent, {
+         width: '350px',
+         position: { top: '40px' },
+         data: {},
+         disableClose: false
+      });
    }
 }

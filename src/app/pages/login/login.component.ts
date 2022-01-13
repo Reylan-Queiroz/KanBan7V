@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
             Validators.required
          ])],
          password: ['', Validators.compose([
-            Validators.minLength(3),
+            Validators.minLength(1),
             Validators.required
          ])]
       });

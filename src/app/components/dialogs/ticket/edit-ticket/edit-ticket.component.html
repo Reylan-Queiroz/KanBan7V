@@ -26,7 +26,7 @@
                </mat-form-field>
 
                <mat-form-field class="col-12 mt-1">
-                  <textarea matInput placeholder="Descrição" [(ngModel)]="description" style="resize: none;" (blur)="addOrEditDescription($event, description)">{{data.ticket.description}}</textarea>
+                  <textarea matInput placeholder="Descrição" [(ngModel)]="description" (blur)="addOrEditDescription($event, description)">{{data.ticket.description}}</textarea>
                </mat-form-field>
 
                <div class="col-12 mt-1">
@@ -96,19 +96,16 @@
                <div class="border border-top-0 rounded-bottom p-3 h-100">
                   <div class="row">
                      <div class="col-9 mb-3">
-                        <input type="text" class="form-control form-control-sm" placeholder="Digite para pesquisar..." [formControl]="searchTagCtrl">
+                        <mat-form-field class="w-100">
+                           <input matInput placeholder="Digite para pesquisar..." [formControl]="searchTagCtrl">
+                        </mat-form-field>
                      </div>
-                     <div class="col-3">
-                        <button class="btn btn-sm btn-outline-dark w-100" id="btnCollapseAddTag" data-bs-toggle="collapse" data-bs-target="#collapseCreateTag" (click)="inputTag.focus()">
-                           <i class="fas fa-plus"></i>
-                        </button>
-                     </div>
-                     <div class="collapse col-12 mb-3" id="collapseCreateTag">
-                        <input type="text" class="form-control form-control-sm" #inputTag placeholder="Insira o nome da etiqueta" maxlength="18" (keydown.enter)="addNewTag($event)">
+                     <div class="col-3 mt-2">
+                        <button mat-raised-button (click)="openAddTagDialog()"><i class="fas fa-plus"></i></button>
                      </div>
                      <div class="col-12">
                         <div *ngFor="let tag of filteredTags$ | async">
-                           <mat-checkbox id="{{tag?.id}}" [(ngModel)]="tag.checked" (change)="addTagToTicket($event)">
+                           <mat-checkbox [id]="tag?.id" [(ngModel)]="tag.checked" (change)="addTagToTicket($event, tag?.ticketTagsId)">
                               <small>{{tag?.name}}</small>
                            </mat-checkbox>
                         </div>

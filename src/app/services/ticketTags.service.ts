@@ -15,7 +15,7 @@ export class TicketTagsService implements CrudInterface {
    }
 
    getAll() {
-      throw new Error('Method not implemented.');
+      return this.http.get(`${GlobalConstants.apiUrl}/TicketTags`)
    }
 
    getById(id: number) {
@@ -27,6 +27,6 @@ export class TicketTagsService implements CrudInterface {
    }
 
    delete(id: number) {
-      throw new Error('Method not implemented.');
+      return this.http.delete(`${GlobalConstants.apiUrl}/TicketTags/${id}`);
    }
 }

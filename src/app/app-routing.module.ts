@@ -13,7 +13,7 @@ const routes: Routes = [
       children: [
          { path: '', component: BoardComponent },
          { path: 'quadros', component: BoardComponent },
-         { path: 'kanban', component: KanbanComponent }
+         { path: 'kanban/:id', component: KanbanComponent }
       ],
       component: DrawerComponent
    },

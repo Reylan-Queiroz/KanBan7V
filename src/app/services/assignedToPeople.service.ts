@@ -15,7 +15,7 @@ export class AssignedToPeopleService implements CrudInterface {
    }
 
    getAll() {
-      throw new Error('Method not implemented.');
+      return this.http.get(`${GlobalConstants.apiUrl}/AssignedToPeople`)
    }
 
    getById(id: number) {

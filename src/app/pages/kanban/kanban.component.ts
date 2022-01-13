@@ -1,4 +1,3 @@
-import { DeleteTicketComponent } from '../../components/dialogs/delete-ticket/delete-ticket.component';
 import { GlobalConstants } from 'src/app/helpers/global-constants';
 import { People } from '../../models/people';
 import { DataService } from '../../services/data.service';
@@ -12,13 +11,14 @@ import { Utils } from 'src/app/helpers/utils';
 import { Column } from 'src/app/models/column';
 import { TicketService } from 'src/app/services/ticket.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Conversation } from 'src/app/models/conversation';
-import { EditTicketComponent } from 'src/app/components/dialogs/edit-ticket/edit-ticket.component';
+import { EditTicketComponent } from 'src/app/components/dialogs/ticket/edit-ticket/edit-ticket.component';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { AddTicketComponent } from 'src/app/components/dialogs/add-ticket/add-ticket.component';
 import { Security } from 'src/app/utils/security.util';
 import { User } from 'src/app/models/user';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+import { AddTicketComponent } from 'src/app/components/dialogs/ticket/add-ticket/add-ticket.component';
+import { DeleteTicketComponent } from 'src/app/components/dialogs/ticket/delete-ticket/delete-ticket.component';
 
 @Component({
    selector: 'app-board',
@@ -26,14 +26,14 @@ import { ActivatedRoute, Router } from '@angular/router';
    styleUrls: ['./kanban.component.scss']
 })
 export class KanbanComponent implements OnInit {
+   private wasChanged = new BehaviorSubject<boolean>(false);
    private user: User = Security.getUser();
+   private boardId: number;
 
    data: any[] = [];
    columnsAndTickets: any[] = [];
 
-   private allColumns: Column[] = [];
    private allTickets: Ticket[] = [];
-   private allConversations: Conversation[] = [];
    private allPeoples: People[] = [];
 
    formColumn: FormGroup;
@@ -46,11 +46,8 @@ export class KanbanComponent implements OnInit {
 
       private formBuilder: FormBuilder,
       private matDialog: MatDialog,
-      private router: Router,
+      private activatedRoute: ActivatedRoute,
    ) {
-      const data = router.getCurrentNavigation().extras.state.data;
-      console.log(data);
-
       this.formColumn = this.formBuilder.group({
          nameColumn: ['', Validators.compose([
             Validators.minLength(3),
@@ -62,79 +59,58 @@ export class KanbanComponent implements OnInit {
    }
 
    async ngOnInit() {
+      this.activatedRoute.params.subscribe(params => {
+         this.boardId = Number.parseInt(atob(params['id']));
+      });
+
       await this.loadData();
+
+      this.wasChanged.subscribe(async changed => changed === true ? await this.loadData() : '');
    }
 
    private async loadData() {
-      try {
-         var response = await this.dataService.get().toPromise();
-         console.log(response);
-
-         let column: Column;
-
-         this.allColumns = response.columns;
-         this.allTickets = response.tickets;
-         this.allConversations = response.conversations;
-         this.allPeoples = response.peoples;
-
-         this.allColumns.forEach((elColumn: Column) => {
-            column = new Column(elColumn.id.toString(), elColumn.title, elColumn.position, []);
-
-            column.tickets = this.allTickets.filter((ticket: Ticket) =>
-               ticket.columnId === elColumn.id
-            );
-
-            column.tickets.sort((a, b) =>
-               (a.position < b.position) ? -1 : 1
-            );
-
-            column.tickets.forEach((elTicket: any) => {
-               elTicket.conversations = this.allConversations.filter((conversation: Conversation) =>
-                  conversation.ticketId === elTicket.id
-               );
-
-               elTicket.assignedToPeople = [];
-
-               response.assignedToPeople.forEach(element => {
-                  if (element.ticketId === elTicket.id) {
-                     elTicket.assignedToPeopleId = element.id;
-                     elTicket.assignedToPeople.push(element.people);
-                  }
-               });
-
-               elTicket.tags = [];
-
-               response.ticketTags.forEach(element => {
-                  if (element.ticketId === elTicket.id) {
-                     elTicket.ticketTagsId = element.id;
-
-                     element.tag.checked = true;
-
-                     elTicket.tags.push(element.tag)
-                  }
-               });
-            });
-
-            this.columnsAndTickets.push(column);
-         });
-
-         this.columnsAndTickets.sort((a, b) =>
-            (a.position < b.position) ? -1 : 1
-         );
-      } catch (error) {
-         // ignore
-      }
-
-      let data = { columnsAndTickets: this.columnsAndTickets };
-      let arr: any[] = [];
-      arr.push(data);
-      this.data = arr;
-   }
-
-   private reloadData() {
       this.data = [];
       this.columnsAndTickets = [];
-      this.loadData();
+
+      await this.dataService.get()
+         .toPromise()
+         .then((response) => {
+            let columns = (response.columns || []).filter(el => el.boardId === this.boardId);
+            let column: Column;
+
+            let tags: any = (response.tags || []);
+            let ticketTags: any = (response.ticketTags || []);
+
+            ticketTags.forEach(elTicketTags => { elTicketTags.tag = tags.find(el => el.id === elTicketTags.tagId); });
+
+            columns.forEach((elColumn: Column) => {
+               column = new Column(elColumn.id.toString(), elColumn.title, elColumn.position, elColumn.boardId, [])
+
+               column.tickets = (response.tickets || []).filter((ticket: Ticket) =>
+                  ticket.columnId === elColumn.id
+               );
+
+               column.tickets.sort((a, b) =>
+                  (a.position < b.position) ? -1 : 1
+               );
+
+               column.tickets.forEach((elTicket: Ticket) => {
+                  elTicket.assignedToPeople = [];
+                  elTicket.conversations = [];
+                  elTicket.tags = [];
+
+                  ticketTags.forEach(elTicketTags => {
+                     if (elTicketTags.ticketId !== elTicket.id) { return; }
+
+                     elTicket.tags.push(elTicketTags.tag);
+                  });
+               });
+
+               this.columnsAndTickets.push(column);
+            });
+         }).catch(error => console.log(error));
+
+      this.data = [{ columnsAndTickets: this.columnsAndTickets }];
    }
 
    connectedToIds(index): string[] {
@@ -187,7 +163,7 @@ export class KanbanComponent implements OnInit {
       }
    }
 
-   openDialogAddTicket(column: Column) {
+   openAddTicketDialog(column: Column) {
       let user = this.user;
 
       const dialog = this.matDialog.open(AddTicketComponent, {
@@ -198,13 +174,15 @@ export class KanbanComponent implements OnInit {
       });
 
       dialog.afterClosed().subscribe((result) => {
-         if (result === undefined) { return; }
+         console.log(result);
 
-         this.reloadData();
+         if (!result) { return; }
+
+         this.wasChanged.next(true);
       });
    }
 
-   openDialogEditTicket(ticket: Ticket, column: Column) {
+   openEditTicketDialog(ticket: Ticket, column: Column) {
       let user = this.user;
 
       const dialog = this.matDialog.open(EditTicketComponent, {
@@ -215,19 +193,23 @@ export class KanbanComponent implements OnInit {
          data: { ticket, column, user },
       });
 
-      dialog.afterClosed().subscribe((result) => {
-         if (result === undefined) { return; }
-
-         this.reloadData();
+      dialog.afterClosed().subscribe(() => {
+         dialog.componentInstance.changed ? this.wasChanged.next(true) : '';
       });
    }
 
-   openDialogDeleteTicket(ticket: Ticket, column: Column) {
-      this.matDialog.open(DeleteTicketComponent, {
+   openDeleteTicketDialog(ticket: Ticket, column: Column) {
+      const dialog = this.matDialog.open(DeleteTicketComponent, {
          width: '400px',
          height: 'auto',
          position: { top: '40px' },
          data: { ticket, column }
+      });
+
+      dialog.afterClosed().subscribe(result => {
+         if (!result) { return; }
+
+         this.wasChanged.next(true);
       });
    }
 
@@ -241,13 +223,13 @@ export class KanbanComponent implements OnInit {
 
       if (name.length < 3) { return; }
 
-      let column = new Column(0, name, position, []);
+      let column = new Column(0, name, position, this.boardId, []);
 
       this.columnService.create(column).subscribe(
          () => {
             this.toastrService.success('Coluna criada com sucesso.', 'Êxito', GlobalConstants.toastrConfig);
 
-            this.reloadData();
+            this.wasChanged.next(true);
          },
          (error: HttpErrorResponse) => {
             this.toastrService.error(error.message, `Error ${error.status}`, GlobalConstants.toastrConfig);

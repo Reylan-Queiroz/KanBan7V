@@ -1,5 +1,4 @@
-import { GlobalConstants } from 'src/app/helpers/global-constants';
-import { Ticket } from 'src/app/models/ticket';
+import { GlobalConstants } from './../helpers/global-constants';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CrudInterface } from '../interfaces/crud-interface';
@@ -12,11 +11,11 @@ export class TicketService implements CrudInterface {
    constructor(private http: HttpClient) { }
 
    create(obj: any) {
-      return this.http.post<Ticket>(`${GlobalConstants.apiUrl}/ticket/create`, obj);
+      return this.http.post(`${GlobalConstants.apiUrl}/Ticket/Create`, obj);
    }
 
    getAll() {
-      throw new Error('Method not implemented.');
+      return this.http.get(`${GlobalConstants.apiUrl}/Ticket`);
    }
 
    getById(id: number) {
@@ -24,10 +23,10 @@ export class TicketService implements CrudInterface {
    }
 
    update(id: number, obj: any) {
-      return this.http.put<Ticket>(`${GlobalConstants.apiUrl}/Ticket/${id}`, obj);
+      return this.http.put(`${GlobalConstants.apiUrl}/Ticket/${id}`, obj);
    }
 
    delete(id: number) {
-      return this.http.delete<Ticket>(`${GlobalConstants.apiUrl}/Ticket/${id}`);
+      return this.http.delete(`${GlobalConstants.apiUrl}/Ticket/${id}`);
    }
 }

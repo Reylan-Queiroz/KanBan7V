@@ -5,6 +5,7 @@ export class Column {
       public id: any,
       public title: string,
       public position: number,
+      public boardId: number,
       public tickets: Ticket[]
    ) { }
 }

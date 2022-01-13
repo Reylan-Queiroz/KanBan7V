@@ -39,3 +39,7 @@
 .form-danger {
    border: 2px solid #ff0000 !important;
 }
+
+.clickable {
+   cursor: pointer;
+}

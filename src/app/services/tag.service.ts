@@ -7,7 +7,6 @@ import { CrudInterface } from '../interfaces/crud-interface';
    providedIn: 'root'
 })
 export class TagService implements CrudInterface {
-
    constructor(private http: HttpClient) { }
 
    create(obj: any) {

@@ -1,13 +1,13 @@
 import { User } from 'src/app/models/user';
 import { GlobalConstants } from 'src/app/helpers/global-constants';
-import { TicketService } from './../../../services/ticket.service';
-import { Ticket } from './../../../models/ticket';
 import { Component, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Column } from 'src/app/models/column';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
+import { TicketService } from 'src/app/services/ticket.service';
+import { Ticket } from 'src/app/models/ticket';
 
 @Component({
    selector: 'app-add-ticket',
@@ -31,6 +31,8 @@ export class AddTicketComponent {
    }
 
    onSubmit(form: FormGroup) {
+      if (!form.valid) { return; }
+
       const columnId = this.data.column.id;
       const title = form.value['title'];
       const position = this.data.column.tickets.length;
