@@ -1,10 +1,11 @@
-import { AddBoardComponent } from '../../components/dialogs/board/add-board/add-board.component';
+
 import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { BoardService } from './../../services/board.service';
 import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { Board } from 'src/app/models/board';
+import { Board } from 'src/app/shared/models/board';
+import { BoardService } from 'src/app/core/services/board.service';
+import { AddBoardComponent } from 'src/app/shared/components/dialogs/board/add-board/add-board.component';
 
 @Component({
    selector: 'app-board',

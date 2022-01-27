@@ -1,24 +1,24 @@
-import { GlobalConstants } from 'src/app/helpers/global-constants';
-import { People } from '../../models/people';
-import { DataService } from '../../services/data.service';
-import { Ticket } from 'src/app/models/ticket';
-import { ColumnService } from '../../services/column.service';
+import { Helpers } from './../../shared/utils/helpers.util';
+import { Constants } from './../../shared/utils/constants.util';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
-import { Utils } from 'src/app/helpers/utils';
-import { Column } from 'src/app/models/column';
-import { TicketService } from 'src/app/services/ticket.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { EditTicketComponent } from 'src/app/components/dialogs/ticket/edit-ticket/edit-ticket.component';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Security } from 'src/app/utils/security.util';
-import { User } from 'src/app/models/user';
+import { Security } from 'src/app/shared/utils/security.util';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-import { AddTicketComponent } from 'src/app/components/dialogs/ticket/add-ticket/add-ticket.component';
-import { DeleteTicketComponent } from 'src/app/components/dialogs/ticket/delete-ticket/delete-ticket.component';
+import { User } from 'src/app/shared/models/user';
+import { Ticket } from 'src/app/shared/models/ticket';
+import { People } from 'src/app/shared/models/people';
+import { ColumnService } from 'src/app/core/services/column.service';
+import { TicketService } from 'src/app/core/services/ticket.service';
+import { DataService } from 'src/app/core/services/data.service';
+import { Column } from 'src/app/shared/models/column';
+import { AddTicketComponent } from 'src/app/shared/components/dialogs/ticket/add-ticket/add-ticket.component';
+import { EditTicketComponent } from 'src/app/shared/components/dialogs/ticket/edit-ticket/edit-ticket.component';
+import { DeleteTicketComponent } from 'src/app/shared/components/dialogs/ticket/delete-ticket/delete-ticket.component';
 
 @Component({
    selector: 'app-board',
@@ -35,6 +35,7 @@ export class KanbanComponent implements OnInit {
 
    private allTickets: Ticket[] = [];
    private allPeoples: People[] = [];
+   private allColumns: [] = [];
 
    formColumn: FormGroup;
 
@@ -75,16 +76,19 @@ export class KanbanComponent implements OnInit {
       await this.dataService.get()
          .toPromise()
          .then((response) => {
-            let columns = (response.columns || []).filter(el => el.boardId === this.boardId);
+            this.allColumns = (response.columns || []).filter(el => el.boardId === this.boardId);
             let column: Column;
 
+            this.allTickets = (response.tickets || []);
+            let colors: any = (response.colors || []);
             let tags: any = (response.tags || []);
             let ticketTags: any = (response.ticketTags || []);
 
+            tags.forEach(elTags => { elTags.color = colors.find(el => el.id === elTags.colorId); });
             ticketTags.forEach(elTicketTags => { elTicketTags.tag = tags.find(el => el.id === elTicketTags.tagId); });
 
-            columns.forEach((elColumn: Column) => {
-               column = new Column(elColumn.id.toString(), elColumn.title, elColumn.position, elColumn.boardId, [])
+            this.allColumns.forEach((elColumn: Column) => {
+               column = new Column(elColumn.id.toString(), elColumn.title, elColumn.position, elColumn.boardId, null, []);
 
                column.tickets = (response.tickets || []).filter((ticket: Ticket) =>
                   ticket.columnId === elColumn.id
@@ -94,7 +98,7 @@ export class KanbanComponent implements OnInit {
                   (a.position < b.position) ? -1 : 1
                );
 
-               column.tickets.forEach((elTicket: Ticket) => {
+               column.tickets.forEach((elTicket: any) => {
                   elTicket.assignedToPeople = [];
                   elTicket.conversations = [];
                   elTicket.tags = [];
@@ -102,6 +106,8 @@ export class KanbanComponent implements OnInit {
                   ticketTags.forEach(elTicketTags => {
                      if (elTicketTags.ticketId !== elTicket.id) { return; }
 
+                     elTicket.ticketTagsId = elTicketTags.id;
+                     elTicketTags.tag.checked = true;
                      elTicket.tags.push(elTicketTags.tag);
                   });
                });
@@ -149,6 +155,7 @@ export class KanbanComponent implements OnInit {
          let columnId = Number.parseInt(event.container.id);
          let ticketId = Number.parseInt(event.item.element.nativeElement.id);
          let ticket = this.allTickets.find(el => el.id === ticketId);
+
          ticket.columnId = columnId;
          ticket.position = newPosition;
 
@@ -174,8 +181,6 @@ export class KanbanComponent implements OnInit {
       });
 
       dialog.afterClosed().subscribe((result) => {
-         console.log(result);
-
          if (!result) { return; }
 
          this.wasChanged.next(true);
@@ -183,17 +188,18 @@ export class KanbanComponent implements OnInit {
    }
 
    openEditTicketDialog(ticket: Ticket, column: Column) {
-      let user = this.user;
+      const user = this.user;
+      const boardId = this.boardId;
 
       const dialog = this.matDialog.open(EditTicketComponent, {
          width: '65%',
          height: '90vh',
          position: { top: '40px' },
          panelClass: 'trend-dialog', // class that disables overflow-y
-         data: { ticket, column, user },
+         data: { ticket, column, user, boardId },
       });
 
-      dialog.afterClosed().subscribe(() => {
+      dialog.afterClosed().subscribe((result) => {
          dialog.componentInstance.changed ? this.wasChanged.next(true) : '';
       });
    }
@@ -213,8 +219,8 @@ export class KanbanComponent implements OnInit {
       });
    }
 
-   filterByDate(talks, asc = 1) {
-      // talks = [...talks.sort((a: any, b: any) => (asc) * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()))];
+   filterByDate(tickets, asc = 1) {
+      tickets = [...tickets.sort((a: any, b: any) => (asc) * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()))];
    }
 
    addColumn(event: any) {
@@ -223,20 +229,20 @@ export class KanbanComponent implements OnInit {
 
       if (name.length < 3) { return; }
 
-      let column = new Column(0, name, position, this.boardId, []);
+      let column = new Column(0, name, position, this.boardId, null, []);
 
       this.columnService.create(column).subscribe(
          () => {
-            this.toastrService.success('Coluna criada com sucesso.', 'Êxito', GlobalConstants.toastrConfig);
+            this.toastrService.success('Coluna criada com sucesso.', 'Êxito', Constants.toastrConfig);
 
             this.wasChanged.next(true);
          },
          (error: HttpErrorResponse) => {
-            this.toastrService.error(error.message, `Error ${error.status}`, GlobalConstants.toastrConfig);
+            this.toastrService.error(error.message, `Error ${error.status}`, Constants.toastrConfig);
          });
 
-      Utils.clearForm(this.formColumn);
-      Utils.clickButton('btnCollapseAddColumn');
+      Helpers.clearForm(this.formColumn);
+      Helpers.clickButton('btnCollapseAddColumn');
    }
 
    editColumnName(event: FocusEvent, column: Column) {
@@ -244,7 +250,7 @@ export class KanbanComponent implements OnInit {
       const newTitle = element.innerText.trim();
 
       if (newTitle.length > 18) {
-         this.toastrService.error('O nome excedeu o limite de caracteres(18).', 'Erro', GlobalConstants.toastrConfig);
+         this.toastrService.error('O nome excedeu o limite de caracteres(18).', 'Erro', Constants.toastrConfig);
 
          element.innerText = column.title; // return to old value
 
@@ -257,11 +263,10 @@ export class KanbanComponent implements OnInit {
 
       this.columnService.update(Number.parseInt(column.id), column).subscribe(
          () => {
-            this.toastrService.success('Nome alterado com sucesso.', 'Êxito', GlobalConstants.toastrConfig);
-         },
-         (error: HttpErrorResponse) => {
-            this.toastrService.error(error.message, `Error ${error.status}`, GlobalConstants.toastrConfig);
+            this.toastrService.success('Nome alterado com sucesso.', 'Êxito', Constants.toastrConfig);
+         }, (error: HttpErrorResponse) => {
+            this.toastrService.error(error.message, `Error ${error.status}`, Constants.toastrConfig);
          }
-      )
+      );
    }
 }

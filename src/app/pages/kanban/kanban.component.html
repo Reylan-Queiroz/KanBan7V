@@ -9,16 +9,16 @@
          <div class="col-4 text-end">
             <div cdkDragHandle>
                <button mat-icon-button [matMenuTriggerFor]="menu">
-                  <mat-icon>filter_list</mat-icon>
+                  <mat-icon>sort</mat-icon>
                </button>
                <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="filterByDate(null, -1)">
+                  <button mat-menu-item (click)="filterByDate(column.tickets, 1)">
                      <mat-icon>arrow_downward</mat-icon>
-                     <span>Sort By(Date)</span>
+                     <span>Ordenar por(Data)</span>
                   </button>
-                  <button mat-menu-item (click)="filterByDate(null, 1)">
+                  <button mat-menu-item (click)="filterByDate(column.tickets, -1)">
                      <mat-icon>arrow_upward</mat-icon>
-                     <span>Sort By(Date)</span>
+                     <span>Ordenar por(Data)</span>
                   </button>
                </mat-menu>
                <button mat-icon-button>

@@ -1,9 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { LoginService } from './../../services/login.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { Security } from 'src/app/utils/security.util';
+import { Security } from 'src/app/shared/utils/security.util';
 import { Router } from '@angular/router';
+import { LoginService } from 'src/app/core/services/login.service';
 
 @Component({
    selector: 'app-login',

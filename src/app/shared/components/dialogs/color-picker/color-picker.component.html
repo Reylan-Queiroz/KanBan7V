@@ -1,0 +1,9 @@
+<form [formGroup]="form">
+   <mat-form-field class="w-100">
+      <input matInput placeholder="Nome" formControlName="name">
+   </mat-form-field>
+   <color-chrome (onChangeComplete)="onChangeComplete($event)"></color-chrome>
+   <br>
+   <button mat-raised-button color="primary" (click)="onSubmit(form)" style="margin-right: 10px;">Criar</button>
+   <button mat-raised-button matDialogClose>Cancelar</button>
+</form>
