@@ -1,0 +1,10 @@
+<div class="container mt-3" style="height: 91.5vh;">
+   <div class="row">
+      <div class="col-6">
+         <app-users-dashboard [dataSource]="dataSource" (openDialogEvent)="openAddUserDialog()"></app-users-dashboard>
+      </div>
+      <div class="col-6">
+         <app-user-group-dashboard [dataSource]="dataSource" (openDialogEvent)="openAddUserGroupDialog()"></app-user-group-dashboard>
+      </div>
+   </div>
+</div>

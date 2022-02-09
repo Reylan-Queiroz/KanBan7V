@@ -20,14 +20,14 @@ export class FileService implements CrudInterface {
    }
 
    getById(id: number) {
-      throw new Error('Method not implemented.');
+      return this.http.get(`${Constants.api}/FileManager/${id}`);
    }
 
    update(id: number, obj: any) {
-      throw new Error('Method not implemented.');
+      return this.http.put(`${Constants.api}/FileManager/${id}`, obj);
    }
 
    delete(id: number) {
-      throw new Error('Method not implemented.');
+      return this.http.delete(`${Constants.api}/FileManager/${id}`);
    }
 }

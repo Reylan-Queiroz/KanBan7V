@@ -1,0 +1,129 @@
+// Our custom element will be `display: inline` by default. Make it a block and add some spacing.
+:host {
+   display: block;
+   margin-bottom: 8px;
+}
+
+// Remove Material's margin from the content since we have a row of chips.
+.mat-card-content {
+   margin-bottom: 0;
+}
+
+// Spread out the actions content to the left and right.
+.align-end {
+   display: flex;
+   align-items: center;
+   justify-content: flex-end;
+}
+
+// Add some spacing to the chip list
+.mat-chip-list {
+   display: block;
+   margin-top: 12px;
+}
+
+// Allows for the image to cover the card while preserving its dimensions.
+.mat-card-image {
+   object-fit: cover;
+   object-position: top;
+   max-height: 150px;
+}
+
+// Increase the size of the author's name and add some spacing.
+// .author {
+//   font-size: 14px;
+//   margin-left: 8px;
+// }
+
+.card-ticket {
+   position: relative;
+   min-height: 90px;
+}
+
+.icon-trash {
+   cursor: pointer;
+   position: absolute;
+   right: 6px;
+   top: 10px;
+}
+
+.icon-info {
+   cursor: pointer;
+   position: absolute;
+   right: 6px;
+   bottom: 10px;
+}
+
+.icon-description {
+   cursor: pointer;
+   position: absolute;
+   right: 30px;
+   top: 10px;
+}
+
+.creationDateText {
+   position: absolute;
+   left: 5px;
+   bottom: 10px;
+}
+
+.list-assignedTo {
+   position: absolute;
+   right: 5px;
+   bottom: 3px;
+}
+
+.list-tags {
+   position: absolute;
+   top: 0px;
+}
+
+.member {
+   background-color: #dfe1e6;
+   border-radius: 25em;
+   color: #172b4d;
+   cursor: pointer;
+   display: block;
+   float: left;
+   height: 32px;
+   margin: 0 4px 4px 0;
+   overflow: visible;
+   position: relative;
+   text-decoration: none;
+   -webkit-user-select: none;
+   user-select: none;
+   width: 32px;
+   z-index: 0;
+}
+
+.member-initials {
+   display: block;
+   font-size: 12px;
+   font-weight: 700;
+   height: 32px;
+   left: 0;
+   line-height: 32px;
+   overflow: hidden;
+   position: absolute;
+   text-align: center;
+   top: 0;
+   width: 100%;
+}
+
+span.badge {
+   margin-left: 8px;
+}
+
+mat-chip.text-light {
+   min-height: 20px;
+   min-width: 35px;
+   cursor: pointer;
+}
+
+.popover {
+   background: lightgoldenrodyellow;
+}
+
+.tagName{
+   display: none;
+}

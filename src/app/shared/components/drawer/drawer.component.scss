@@ -1,9 +1,9 @@
-.sidenav-container {
-   // height: 100%;
-}
-
 .sidenav {
    width: 270px;
+}
+
+mat-nav-list {
+   padding: 10px;
 }
 
 .sidenav .mat-toolbar {
@@ -18,7 +18,25 @@
 }
 
 .mat-sidenav-content {
-   // Contain the board within its container.
    display: flex;
    flex-direction: column;
+}
+
+.tree-invisible {
+   display: none;
+}
+
+.tree ul,
+.tree li {
+   margin-top: 0;
+   margin-bottom: 0;
+   list-style-type: none;
+}
+
+mat-nested-tree-node li {
+   cursor: pointer;
+}
+
+mat-nested-tree-node li ul:hover {
+   font-weight: bold;
 }

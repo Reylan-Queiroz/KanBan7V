@@ -1,0 +1,31 @@
+<mat-card class="card-ticket">
+   <mat-card-content>
+      <mat-icon class="icon-trash text-danger" matTooltip="Excluir ticket." (click)="delete.next()">delete</mat-icon>
+
+      <div class="list-tags" *ngIf="tags">
+         <mat-chip-list>
+            <mat-chip matTooltip="{{tag.name}}" class="text-light" [style.background]="tag?.color.code ? tag.color.code : '#C0C0C0'" *ngFor="let tag of tags" ><small class="tagName">{{tag?.name}}</small></mat-chip> <!--(click)="compressTags()"-->
+         </mat-chip-list>
+      </div>
+
+      <div class="clickable" (click)="edit.next()" style="min-height: 35px; margin-top: 30px;">
+         <h6 class="text-break">{{ticket.title}}</h6>
+      </div>
+
+   </mat-card-content>
+
+   <mat-card-actions>
+      <span class="badge" [style.background]="background" [style.color]="textColor">{{(dateDisplayed) | date: 'dd/MMM HH:mm'}}</span>
+
+      <mat-icon class="clickable icon-description" *ngIf="ticket.description" matTooltip="Este ticket contém uma descrição.">description</mat-icon>
+      <div class="list-assignedTo" *ngIf="ticket.assignedTo.length !== 0">
+         <div class="member" *ngFor="let item of ticket.assignedTo" [matMenuTriggerFor]="menu" (click)="peopleName = item.name">
+            <span class="member-initials">{{item?.name[0]}}</span>
+         </div>
+      </div>
+   </mat-card-actions>
+</mat-card>
+
+<mat-menu class="popover" #menu="matMenu">
+   <span mat-menu-item  [disableRipple]="true" (click)="$event.stopPropagation()" [innerText]="peopleName"></span>
+</mat-menu>

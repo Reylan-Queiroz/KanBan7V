@@ -1,0 +1,26 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+   <mat-form-field>
+      <input matInput placeholder="Nome do Grupo" required formControlName="name">
+      <!-- <mat-error *ngIf="form.controls['name'].invalid">{{getErrorMessage()}}</mat-error> -->
+   </mat-form-field>
+   <mat-form-field>
+      <mat-chip-list #chipList>
+         <mat-chip *ngFor="let people of selectedPeople" [selectable]="matChipConfiguration.selectable" [removable]="matChipConfiguration.removable" (removed)="removeChip(people)">
+            {{people?.name}}
+            <i class="fas fa-times mt-1" matChipRemove *ngIf="matChipConfiguration.removable"></i>
+         </mat-chip>
+         <input placeholder="Pessoas" #peopleInput [formControl]="peopleCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="matChipConfiguration.addOnBlur" (matChipInputTokenEnd)="addChip($event)">
+      </mat-chip-list>
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedChip($event)">
+         <mat-option *ngFor="let people of filteredPeople$ | async" [value]="people?.id">
+            {{people?.name}}
+         </mat-option>
+      </mat-autocomplete>
+   </mat-form-field>
+
+   <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Cancelar</button>
+      <!-- <button mat-button type="submit">{{data?.edit ? 'Update' : 'Add'}}</button> -->
+      <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid || selectedPeople.length === 0">Criar</button>
+   </mat-dialog-actions>
+</form>

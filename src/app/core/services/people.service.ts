@@ -1,7 +1,9 @@
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Constants } from 'src/app/shared/utils/constants.util';
 import { CrudInterface } from '../../shared/interfaces/crud-interface';
+import { People } from 'src/app/shared/models/people';
 
 @Injectable({
    providedIn: 'root'
@@ -15,7 +17,7 @@ export class PeopleService implements CrudInterface {
    }
 
    getAll() {
-      return this.http.get(`${Constants.api}/People`);
+      return this.http.get<Observable<People[]>>(`${Constants.api}/People`);
    }
 
    getById(id: number) {

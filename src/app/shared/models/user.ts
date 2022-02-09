@@ -1,4 +1,6 @@
+
 import { People } from "./people";
+import { RoleModel } from "./RoleModel";
 
 export class User {
    constructor(
@@ -6,7 +8,8 @@ export class User {
       public login: string,
       public password: string,
       public roleId: number,
-      public role: string,
+      public role: RoleModel,
+
       public peopleId: number,
       public people: People,
    ) { }

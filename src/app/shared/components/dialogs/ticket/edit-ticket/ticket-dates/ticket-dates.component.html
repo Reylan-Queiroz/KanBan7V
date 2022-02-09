@@ -1,0 +1,16 @@
+<div class="rounded-top p-1 px-2" style="background-color: rgb(194, 199, 204);">
+   <small>Datas</small>
+</div>
+<div class="border border-top-0 rounded-bottom p-3">
+   <mat-form-field>
+      <input matInput [ngxMatDatetimePicker]="picker" [(ngModel)]="dueDate" placeholder="Data de vencimento" (dateChange)="addDueDate($event)">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <ngx-mat-datetime-picker #picker>
+         <ng-template>
+            <span>OK</span>
+         </ng-template>
+      </ngx-mat-datetime-picker>
+   </mat-form-field>
+
+   <mat-checkbox [(ngModel)]="currentTicket.hasFinished" (change)="onCheckboxChange($event)">Ticket finalizado</mat-checkbox>
+</div>

@@ -1,0 +1,153 @@
+<div class="row">
+   <div class="col-12 mb-3">
+      <span class="float-end" style="cursor: pointer" [mat-dialog-close]="data.ticket"><i class="fas fa-times"></i></span>
+   </div>
+   <div class="col-8 custom-height">
+      <div class="rounded-top p-1 px-2" style="background-color: rgb(194, 199, 204);">
+         <small>{{data.ticket.title}}</small>
+         <small class="float-end">#{{data.ticket.id}}</small>
+      </div>
+      <div class="border border-top-0 rounded-bottom p-3 h-100">
+         <div class="row h-100">
+            <mat-form-field class="col-12">
+               <mat-chip-list #chipList>
+                  <mat-chip *ngFor="let assignedTo of data.ticket.assignedTo" ngDefaultControl [(ngModel)]="data.ticket.assignedTo" [selectable]="matChipConfiguration.selectable" [removable]="matChipConfiguration.removable" (removed)="removeChip(assignedTo)">
+                     {{assignedTo?.name}}
+                     <i class="fas fa-times mt-1" matChipRemove *ngIf="matChipConfiguration.removable"></i>
+                  </mat-chip>
+                  <input placeholder="Responsáveis" #peopleInput [formControl]="peopleCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="matChipConfiguration.addOnBlur" (matChipInputTokenEnd)="addChip($event)">
+               </mat-chip-list>
+               <mat-autocomplete #auto="matAutocomplete">
+                  <!--(optionSelected)="selectedChip($event)"-->
+                  <mat-option *ngFor="let item of filteredPeoplesAndGroups$ | async" [value]="item?.id" (onSelectionChange)="selectedChip(item)">
+                     {{item?.name}}
+                  </mat-option>
+               </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field class="col-12 mt-1">
+               <textarea matInput placeholder="Descrição" [(ngModel)]="description" (blur)="addOrEditDescription($event, description)">{{data.ticket.description}}</textarea>
+            </mat-form-field>
+
+            <div class="mb-3" appDnd>
+               <mat-expansion-panel class="mt-3">
+                  <mat-expansion-panel-header>
+                     <mat-panel-title>
+                        Anexos <span class="badge badge-dark text-dark">{{data.ticket.files.length}}</span>
+                     </mat-panel-title>
+                  </mat-expansion-panel-header>
+
+                  <label for="formFile" class="form-label small">Adicionar Anexo</label>
+                  <input class="form-control form-control-sm mb-3" type="file" id="formFile" (change)="addFileToTicket($event.target.files[0], data.ticket)">
+
+                  <div class="files-list">
+                     <div class="single-file" *ngFor="let ticketFile of data.ticket.files; let i = index">
+                        <mat-icon style="margin-right: 10px;">folder</mat-icon>
+                        <div class="info">
+                           <h4 class="name mt-2">
+                              {{ ticketFile?.file?.fileName }}
+                           </h4>
+                        </div>
+                        <button mat-icon-button (click)="downloadFile(ticketFile)">
+                           <i class="fas fa-download" style="font-size: 17px"></i>
+                        </button>
+                        <button mat-icon-button (click)="removeFileToTicket(ticketFile)">
+                           <mat-icon>delete</mat-icon>
+                        </button>
+                     </div>
+                  </div>
+               </mat-expansion-panel>
+            </div>
+            <div class="col-12 mt-1">
+               <div class="rounded-top p-1 text-center text-light" style="background-color: indigo;">
+                  <small>Comentários</small>
+               </div>
+               <div class="border border-top-0 rounded-bottom p-3">
+                  <div class="row">
+                     <mat-form-field class="col-12">
+                        <input type="text" matInput placeholder="Escrever um comentário..." (keydown.enter)="addConversation($event)">
+                     </mat-form-field>
+                     <div class="col-12 comments-div">
+                        <div class="row pt-3" *ngFor="let conversation of sortConversation; let i = index">
+                           <div class="col-9">
+                              <div class="member">
+                                 <span class="member-initials">{{conversation.postedBy?.name[0]}}</span>
+                              </div>
+
+                              <span style="margin-right: 10px;">{{conversation.postedBy?.name}}</span>
+
+                              <span style="margin-right: 10px;">{{conversation.date | date: 'HH:mm dd/MMM' }}</span>
+
+                              <small class="clickable text-muted" *ngIf="conversation.modified" matTooltip="{{conversation.oldText}}">(Modificado)</small>
+                           </div>
+
+                           <div class="col-3 text-end">
+                              <div class="btn-group btn-group-sm" role="group">
+                                 <button type="button" class="btn" [id]="'btnEdit' + i" (click)="switchToEditMode($event, i)">
+                                    <i class="fas fa-pencil-alt"></i>
+                                 </button>
+                                 <button type="button" class="btn" [id]="'btnFile' + i" (click)="fileInput.click()">
+                                    <span><i class="fas fa-paperclip"></i></span>
+                                    <input type="file" hidden #fileInput (change)="addFileToConversation($event.target.files[0], conversation)" />
+                                 </button>
+                                 <a class="btn" (click)="downloadFile(conversation.file)" [id]="'btnDownload' + i" [hidden]="!conversation.file">
+                                    <i class="fas fa-download"></i>
+                                 </a>
+                                 <button type="button" class="btn d-none" [id]="'btnConfirm' + i" (click)="confirmTheEdit(conversation, i)">
+                                    <i class="fas fa-check"></i>
+                                 </button>
+                                 <button type="button" class="btn d-none" [id]="'btnCancel' + i" (click)="cancelTheEdit(i)">
+                                    <i class="fas fa-times"></i>
+                                 </button>
+                              </div>
+                           </div>
+
+                           <div class="col-12">
+                              <p class="mb-0 text-break text-muted overflow-auto" contenteditable="false" [id]="'inp' + i">{{conversation.text}}</p>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="col-12 mt-2">
+               <small class="text-muted">Criado pôr: {{data.ticket.postedBy?.name}} em {{data.ticket.createdAt | date: 'dd/MM/yyyy HH:mm'}}</small>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="col-4">
+      <div class="row">
+         <div class="col-12" style="height: calc(90vh - 449px);">
+            <div class="rounded-top p-1 px-2 " style="background-color: rgb(194, 199, 204);">
+               <small>Etiquetas</small>
+            </div>
+            <div class="border border-top-0 rounded-bottom p-3 h-100">
+               <div class="row">
+                  <div class="col-9 mb-3">
+                     <mat-form-field class="w-100">
+                        <input matInput placeholder="Digite para pesquisar..." [(ngModel)]="searchText">
+                     </mat-form-field>
+                  </div>
+                  <div class="col-3 mt-2">
+                     <button mat-raised-button (click)="openAddTagDialog()"><i class="fas fa-plus"></i></button>
+                  </div>
+                  <div class="col-12">
+                     <div *ngFor="let tag of allTags | filter : searchText; let i = index">
+                        <mat-checkbox class="mb-4" [id]="tag?.id" [(ngModel)]="tag.checked" (change)="addOrRemoveTagToTicket($event, tag?.ticketTagsId)">
+                           <span class="badge rounded-pill clickable" [style.background]="tag.color?.code">{{tag?.name}}</span>
+                        </mat-checkbox>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="col-12 mt-5">
+            <app-ticket-transfer [currentTicket]="this.data.ticket" (hasChanged)="changed = true"></app-ticket-transfer>
+         </div>
+         <div class="col-12 mt-3">
+            <app-ticket-dates [currentTicket]="this.data.ticket" (hasChanged)="changed = true"></app-ticket-dates>
+         </div>
+      </div>
+   </div>
+</div>

@@ -11,7 +11,8 @@ export class Ticket {
       public description: string,
       public createdAt: Date,
       public dueDate: Date,
-      public dateConclusion: Date,
+      public dateFinished: Date,
+      public hasFinished: boolean,
       public position: number,
 
       public postedById: number,
@@ -21,7 +22,7 @@ export class Ticket {
       public column: Column,
 
       public files: FileModel[],
-      public assignedToPeople: People[],
+      public assignedTo: [],
       public conversations: Conversation[],
       public tags: Tag[],
    ) { }

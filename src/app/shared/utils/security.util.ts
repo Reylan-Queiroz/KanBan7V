@@ -1,3 +1,4 @@
+import { Role } from "../enums/role.enum";
 import { User } from "../models/user";
 import { Constants } from "./constants.util";
 
@@ -43,16 +44,13 @@ export class Security {
          return false;
    }
 
-   public static isInRole(role: string): boolean {
+   public static isInRole(roles: Role[]): boolean {
       const user = this.getUser();
 
       if (!user)
          return false;
 
-      if (!user.role || user.role.length == 0)
-         return false;
-
-      return user.role.includes(role);
+      return roles.indexOf(user.roleId) >= 0;
    }
 
    public static clear() {
