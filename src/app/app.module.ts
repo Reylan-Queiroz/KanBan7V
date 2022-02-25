@@ -9,6 +9,7 @@ import { MatAutocompleteModule, MatBadgeModule, MatButtonModule, MatCardModule, 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ColorChromeModule } from 'ngx-color/chrome';
+import { NgxSpinnerModule } from 'ngx-spinner';
 import { ToastrModule } from 'ngx-toastr';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -30,7 +31,6 @@ import { TicketTransferComponent } from './shared/components/dialogs/ticket/edit
 import { AddUserGroupDialog } from './shared/components/dialogs/user/add-user-group/add-user-group.dialog';
 import { AddUserDialog } from './shared/components/dialogs/user/add-user/add-user.dialog';
 import { DrawerComponent } from './shared/components/drawer/drawer.component';
-import { LoadingComponent } from './shared/components/loading/loading.component';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { DisableDirective } from './shared/directives/disable.directive';
 import { FilterPipe } from './shared/pipes/filter.pipe';
@@ -50,7 +50,6 @@ registerLocaleData(localePt, 'pt');
       //Components
       CardTicketComponent,
       DrawerComponent,
-      LoadingComponent,
       NavbarComponent,
       UsersDashboardComponent,
       UserGroupDashboardComponent,
@@ -112,6 +111,7 @@ registerLocaleData(localePt, 'pt');
       NgxMatDatetimePickerModule,
       NgxMatTimepickerModule,
       NgxMatNativeDateModule,
+      NgxSpinnerModule
    ],
    entryComponents: [
       EditTicketDialog,

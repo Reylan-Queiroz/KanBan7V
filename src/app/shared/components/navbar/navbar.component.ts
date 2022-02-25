@@ -7,14 +7,11 @@ import { Security } from 'src/app/shared/utils/security.util';
    templateUrl: './navbar.component.html',
    styleUrls: ['./navbar.component.scss'],
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent {
    @Input() drawerReceived;
    loggedUser = Security.getUser();
 
    constructor(private _router: Router) { }
-
-   ngOnInit() {
-   }
 
    logout() {
       Security.clear();

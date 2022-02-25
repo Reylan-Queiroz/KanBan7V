@@ -15,21 +15,21 @@ import { ColorPickerDialog } from '../../color-picker/color-picker.dialog';
    styleUrls: ['./add-tag.dialog.scss']
 })
 export class AddTagDialog implements OnInit {
-   private wasChanged = new BehaviorSubject<boolean>(false);
+   private _wasChanged = new BehaviorSubject<boolean>(false);
 
-   colors: Observable<Color[]>;
+   colors$: Observable<Color[]>;
    form: FormGroup;
    selectedColor: string;
 
    constructor(
-      private dialogRef: MatDialogRef<AddTagDialog>,
-      private fb: FormBuilder,
-      private matDialog: MatDialog,
+      private _dialogRef: MatDialogRef<AddTagDialog>,
+      private _fb: FormBuilder,
+      private _matDialog: MatDialog,
 
-      private colorService: ColorService,
-      private tagService: TagService,
+      private _colorService: ColorService,
+      private _tagService: TagService,
    ) {
-      this.form = this.fb.group({
+      this.form = this._fb.group({
          name: ['', Validators.compose([
             Validators.required,
             Validators.minLength(3)
@@ -39,44 +39,44 @@ export class AddTagDialog implements OnInit {
    }
 
    ngOnInit() {
-      this.loadData();
+      this._loadData();
 
-      this.wasChanged.subscribe(changed => changed === true ? this.loadData() : '');
+      this._wasChanged.subscribe(changed => changed ? this._loadData() : '');
+   }
+
+   private _loadData() {
+      this._colorService.getAll().subscribe(
+         (response) => { this.colors$ = response; },
+         (error) => { console.log(error); }
+      );
    }
 
    selectColor(event: MatSelectChange) {
-      this.colorService.getById(event.value).subscribe(
+      this._colorService.getById(event.value).subscribe(
          (response: any) => {
             this.selectedColor = response.code;
          }, (error) => { console.log(error); }
       );
    }
 
-   private loadData() {
-      this.colorService.getAll().subscribe(
-         (response) => { this.colors = response; },
-         (error) => { console.log(error); }
-      );
-   }
-
    onSubmit(form: FormGroup) {
-      this.tagService.create(new Tag(0, form.value['name'], false, form.value['color'], undefined)).subscribe(
+      this._tagService.create(new Tag(0, form.value['name'], false, form.value['color'], undefined)).subscribe(
          () => {
-            this.dialogRef.close(true);
+            this._dialogRef.close(true);
          }, (error) => { console.log(error); }
       );
    }
 
    openColorPickerDialog(): void {
-      const dialogRef = this.matDialog.open(ColorPickerDialog, {
+      const dialogRef = this._matDialog.open(ColorPickerDialog, {
          position: { top: "40px" }
       });
 
       dialogRef.afterClosed().subscribe(result => {
          if (!result) { return; }
 
-         this.colorService.create(result).subscribe(
-            () => { this.wasChanged.next(true); },
+         this._colorService.create(result).subscribe(
+            () => { this._wasChanged.next(true); },
             (error) => { console.log(error); }
          );
       });

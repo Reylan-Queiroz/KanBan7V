@@ -1,7 +1,7 @@
-<form class="container" [formGroup]="form" (ngSubmit)="onSubmit(form)" (keypress.enter)="onSubmit(form)">
+<form class="container" [formGroup]="form" (ngSubmit)="onSubmit(form)">
    <div class="row">
       <div class="col-12 mb-3">
-         <span class="float-end" style="cursor: pointer" [mat-dialog-close]><i class="fas fa-times"></i></span>
+         <span class="float-end clickable" [mat-dialog-close]><i class="fas fa-times"></i></span>
       </div>
       <div class="col-12">
          <div class="rounded-top p-1 px-2" style="background-color: rgb(194, 199, 204);">
@@ -9,9 +9,12 @@
          </div>
          <div class="border border-top-0 rounded-bottom p-3">
             <div class="row h-100">
-               <mat-form-field class="col-12">
+               <mat-form-field class="col-9">
                   <input matInput placeholder="Nome do quadro" required formControlName="name">
                </mat-form-field>
+               <div class="col-3 my-auto">
+                  <button type="submit" class="w-100" mat-raised-button [disabled]="form.invalid">Criar</button>
+               </div>
             </div>
          </div>
       </div>

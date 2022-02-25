@@ -1,12 +1,15 @@
-import { RoleService } from '../../core/services/role.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { Security } from 'src/app/shared/utils/security.util';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
 import { LoginService } from 'src/app/core/services/login.service';
-import { RoleModel } from 'src/app/shared/models/RoleModel';
 import { fadeInAnimation } from 'src/app/shared/animations/fade-in.animation';
+import { RoleModel } from 'src/app/shared/models/RoleModel';
+import { Constants } from 'src/app/shared/utils/constants.util';
+import { Security } from 'src/app/shared/utils/security.util';
+import { RoleService } from '../../core/services/role.service';
 
 @Component({
    selector: 'app-login',
@@ -17,18 +20,17 @@ import { fadeInAnimation } from 'src/app/shared/animations/fade-in.animation';
    host: { '[@fadeInAnimation]': '' }
 })
 export class LoginPage implements OnInit {
-   private roles: RoleModel[] = [];
-
    form: FormGroup;
 
    constructor(
-      private loginService: LoginService,
-      private _roleService: RoleService,
+      private _fb: FormBuilder,
+      private _router: Router,
+      private _spinner: NgxSpinnerService,
+      private _toastr: ToastrService,
 
-      private fb: FormBuilder,
-      private router: Router,
+      private _loginService: LoginService,
    ) {
-      this.form = this.fb.group({
+      this.form = this._fb.group({
          login: ['', Validators.compose([
             Validators.minLength(3),
             Validators.required
@@ -41,35 +43,34 @@ export class LoginPage implements OnInit {
    }
 
    async ngOnInit() {
-      await this._roleService.getAll()
-         .toPromise()
-         .then((value: any) => {
-            this.roles = value;
-         }).catch((error) => console.log(error));
-
       if (Security.hasToken()) {
          const user = Security.getUser();
          const token = Security.getToken();
 
-         this.setUser(user, token);
+         this._setUser(user, token);
       } else {
          localStorage.clear();
       }
    }
 
    onSubmit(form: FormGroup) {
-      this.loginService.authenticate(form.value).subscribe(
+      this._spinner.show();
+
+      this._loginService.authenticate(form.value).subscribe(
          (data: any) => {
-            this.setUser(data.user, data.token);
+            this._setUser(data.user, data.token);
+            this._spinner.hide();
          },
          (error: HttpErrorResponse) => {
+            this._toastr.error('Usuário ou senha inválidos.', '', Constants.toastrConfig);
+            this._spinner.hide();
             console.log(error);
          }
       );
    }
 
-   private setUser(user, token) {
+   private _setUser(user, token) {
       Security.set(user, token);
-      this.router.navigate(['/']);
+      this._router.navigate(['/']);
    }
 }

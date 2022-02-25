@@ -12,6 +12,7 @@ export class Security {
 
    public static setUser(user: User) {
       const data = JSON.stringify(user);
+
       localStorage.setItem(Constants.kanbanUser, btoa(data));
    }
 
@@ -21,20 +22,20 @@ export class Security {
 
    public static getUser(): User {
       const data = localStorage.getItem(Constants.kanbanUser);
-      if (data) {
+
+      if (data)
          return JSON.parse(atob(data));
-      } else {
+      else
          return null;
-      }
    }
 
    public static getToken(): string {
       const data = localStorage.getItem(Constants.kanbanToken);
-      if (data) {
+
+      if (data)
          return data;
-      } else {
+      else
          return null;
-      }
    }
 
    public static hasToken(): boolean {

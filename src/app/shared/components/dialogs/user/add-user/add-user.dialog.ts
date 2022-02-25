@@ -1,13 +1,13 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef } from '@angular/material';
+import { PeopleService } from 'src/app/core/services/people.service';
+import { Role } from 'src/app/shared/enums/role.enum';
+import { People } from 'src/app/shared/models/people';
+import { RoleModel } from 'src/app/shared/models/RoleModel';
 import { Security } from 'src/app/shared/utils/security.util';
 import { RoleService } from './../../../../../core/services/role.service';
-import { Observable } from 'rxjs';
-import { PeopleService } from 'src/app/core/services/people.service';
 import { UserService } from './../../../../../core/services/user.service';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
-import { People } from 'src/app/shared/models/people';
-import { MatDialogRef } from '@angular/material';
-import { RoleModel } from 'src/app/shared/models/RoleModel';
 
 @Component({
    selector: 'app-add-user',
@@ -57,7 +57,10 @@ export class AddUserDialog implements OnInit {
          }).catch(err => console.log(err));
 
       this.roles.splice(0, 1);
-      this.roles.splice(0, 1);
+
+      if (Security.getUser().roleId !== Role.Master) {
+         this.roles.splice(0, 1);
+      }
    }
 
    onSubmit(form: FormGroup) {
@@ -76,9 +79,5 @@ export class AddUserDialog implements OnInit {
          }, (error) => {
             console.log(error);
          });
-   }
-
-   getErrorMessage() {
-      return this.form.controls['name'].hasError('required') ? 'You must enter a value' : this.form.controls['name'].hasError('minLength') ? 'Not a valid email' : '';
    }
 }

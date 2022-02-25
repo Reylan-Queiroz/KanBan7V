@@ -5,6 +5,7 @@ import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatCheckboxChange } from '@angular/material';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
@@ -79,10 +80,11 @@ export class EditTicketDialog implements OnInit {
    @ViewChild('auto', { static: false }) matAutocomplete: MatAutocomplete;
 
    constructor(
+      @Inject(MAT_DIALOG_DATA) public data: { ticket: any, column: Column, user: User, boardId: number },
       private dialogRef: MatDialogRef<EditTicketDialog>,
       private matDialog: MatDialog,
-      @Inject(MAT_DIALOG_DATA) public data: { ticket: any, column: Column, user: User, boardId: number },
       private _datePipe: DatePipe,
+      private _spinner: NgxSpinnerService,
 
       private toastrService: ToastrService,
       private peopleService: PeopleService,
@@ -103,7 +105,7 @@ export class EditTicketDialog implements OnInit {
    async ngOnInit() {
       await this.loadData();
 
-      this.wasChanged.subscribe(async changed => changed === true ? await this.loadData() : '');
+      this.wasChanged.subscribe(async changed => changed ? await this.loadData() : '');
 
       this.filteredPeoplesAndGroups$ = this.peopleCtrl.valueChanges.pipe(
          startWith(null),
@@ -114,6 +116,8 @@ export class EditTicketDialog implements OnInit {
    }
 
    private async loadData() {
+      this._spinner.show();
+
       let conversations = [];
       let assignedTo = [];
       let colors = [];
@@ -199,8 +203,6 @@ export class EditTicketDialog implements OnInit {
          .then((response: any) => {
             peopleGroupRes = (response || []);
          }).catch(error => console.log(error));
-
-      this._currentUser.people = this.allPeoples.find(el => el.id === this._currentUser.peopleId);
 
       this.allPeoples = this.allPeoples.filter(el => el.createdById === this._currentUser.people.createdById);
 
@@ -294,6 +296,8 @@ export class EditTicketDialog implements OnInit {
       let column = this.columns.find(el => el.id == this.data.column.id);
       const index = this.columns.indexOf(column);
       this.columns.splice(index, 1);
+
+      this._spinner.hide();
    }
 
    addChip(event: MatChipInputEvent) {
@@ -423,7 +427,7 @@ export class EditTicketDialog implements OnInit {
       }
    }
 
-   addFileToTicket(file, ticket: Ticket) {
+   addFileToTicket(file: File, ticket: Ticket) {
       this.getBase64(file).subscribe(res => {
          const obj = { FileAsBase64: res, FileName: file.name };
 
@@ -520,6 +524,7 @@ export class EditTicketDialog implements OnInit {
 
       dialogRef.afterClosed().subscribe(
          (result) => {
+            debugger;
             if (!result) return;
 
             this.wasChanged.next(true);
@@ -540,7 +545,7 @@ export class EditTicketDialog implements OnInit {
 
    downloadFile(ticketFile) {
       const linkSource = `${ticketFile.file.base64signature},${ticketFile.file.bytes}`;
-      const downloadLink = document.createElement("a");
+      const downloadLink = document.createElement('a');
       const fileName = ticketFile.file.fileName;
 
       downloadLink.href = linkSource;

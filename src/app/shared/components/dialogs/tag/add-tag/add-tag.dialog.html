@@ -4,8 +4,8 @@
    </mat-form-field>
    <mat-form-field class="col-9">
       <mat-label>Cor</mat-label>
-      <mat-select class="rounded p-2" formControlName="color" [ngClass]="{'text-light': (selectedColor) }" [style.background]="selectedColor" (selectionChange)="selectColor($event)">
-         <mat-option class="text-light" [value]="color.id" *ngFor="let color of colors" [style.background]="color.code">
+      <mat-select class="rounded p-2" formControlName="color" #colorSelect [ngClass]="{'text-light': (selectedColor) }" [style.background]="selectedColor" (selectionChange)="selectColor($event)">
+         <mat-option class="text-light" [value]="color.id" *ngFor="let color of colors$" [style.background]="color.code">
             <span>{{(color.name || color.code)}}</span>
          </mat-option>
       </mat-select>
@@ -16,7 +16,7 @@
       </button>
    </div>
    <mat-dialog-actions class="col-12">
-      <button type="submit" color="primary" mat-raised-button [disabled]="form.invalid">Criar</button>
+      <button type="submit" color="primary" mat-raised-button [disabled]="form.invalid || !colorSelect.selected">Criar</button>
       <button mat-raised-button mat-dialog-close>Cancelar</button>
    </mat-dialog-actions>
 </form>

@@ -17,18 +17,14 @@ import { fadeInAnimation } from '../../animations/fade-in.animation';
    host: { '[@fadeInAnimation]': '' }
 })
 export class DrawerComponent implements OnInit {
-   treeControl = new NestedTreeControl<any>(node => node.children);
    dataSource = new MatTreeNestedDataSource<any>();
-
-   private boards = [{ name: '', children: [] }];
+   treeControl = new NestedTreeControl<any>(node => node.children);
 
    isHandset$: Observable<boolean> = this._breakpointObserver
       .observe(Breakpoints.Handset)
       .pipe(
          map(result => result.matches)
       );
-
-   hasChild = (_: number, node: any) => !!node.children && node.children.length > 0;
 
    constructor(
       private _breakpointObserver: BreakpointObserver,
@@ -37,13 +33,13 @@ export class DrawerComponent implements OnInit {
       private _boardService: BoardService,
    ) { }
 
-
    async ngOnInit() {
       await this.loadData();
    }
 
    private async loadData() {
       let boards: any[] = [];
+      let data = [{ name: '', children: [] }];
 
       await this._boardService.getAll()
          .toPromise()
@@ -53,14 +49,12 @@ export class DrawerComponent implements OnInit {
 
       boards = boards.filter(el => el.peopleHigherId === Security.getUser().people.createdById);
 
-      this.boards[0].name = 'Quadros';
-      this.boards[0].children = boards;
+      data[0].name = 'Quadros';
+      data[0].children = boards;
 
-      this.dataSource.data = this.boards;
+      this.dataSource.data = data;
    }
 
-   async navigate(boardId) {
-      //await this._router.navigate([`/`]);
-      this._router.navigate([`/kanban/${btoa(boardId)}`]);
-   }
+   hasChild = (_: number, node: any) => !!node.children && node.children.length > 0;
+   navigate = (boardId: any) => this._router.navigate([`/kanban/${btoa(boardId)}`]);
 }

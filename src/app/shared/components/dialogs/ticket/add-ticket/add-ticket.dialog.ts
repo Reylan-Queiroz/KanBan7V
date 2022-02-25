@@ -1,14 +1,12 @@
+import { DatePipe } from '@angular/common';
 import { Component, Inject } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
-import { HttpErrorResponse } from '@angular/common/http';
+import { TicketService } from 'src/app/core/services/ticket.service';
 import { Column } from 'src/app/shared/models/column';
 import { User } from 'src/app/shared/models/user';
-import { TicketService } from 'src/app/core/services/ticket.service';
-import { Ticket } from 'src/app/shared/models/ticket';
 import { Constants } from 'src/app/shared/utils/constants.util';
-import { DatePipe } from '@angular/common';
 
 @Component({
    selector: 'app-add-ticket',
@@ -19,22 +17,22 @@ export class AddTicketDialog {
    form: FormGroup;
 
    constructor(
-      private dialogRef: MatDialogRef<AddTicketDialog>,
       @Inject(MAT_DIALOG_DATA) public data: { column: Column, user: User },
-      private formBuilder: FormBuilder,
+      private _dialogRef: MatDialogRef<AddTicketDialog>,
+      private _fb: FormBuilder,
       private _datePipe: DatePipe,
 
-      private ticketService: TicketService,
-      private toastrService: ToastrService,
+      private _ticketService: TicketService,
+      private _toastrService: ToastrService,
    ) {
-      this.form = this.formBuilder.group({
-         title: ['', Validators.required],
+      this.form = this._fb.group({
+         title: ['', Validators.compose([
+            Validators.required,
+            Validators.minLength(3)])],
       });
    }
 
    onSubmit(form: FormGroup) {
-      if (!form.valid) { return; }
-
       const columnId = this.data.column.id;
       const title = form.value['title'];
       const position = this.data.column.tickets.length;
@@ -42,14 +40,12 @@ export class AddTicketDialog {
 
       let ticket = { id: 0, title: title, description: '', createdAt: newDate, dueDate: undefined, dateConclusion: undefined, position: position, postedById: this.data.user.peopleId, columnId: columnId };
 
-      this.ticketService.create(ticket).subscribe(
+      this._ticketService.create(ticket).subscribe(
          () => {
-            this.toastrService.success('Sucesso!', '', Constants.toastrConfig);
-            this.dialogRef.close('Ticket Criado!');
-         },
-         (error: HttpErrorResponse) => {
-            console.log(error);
-            this.toastrService.error('Falha!', '', Constants.toastrConfig);
+            this._toastrService.success('Sucesso!', '', Constants.toastrConfig);
+            this._dialogRef.close('Ticket Criado!');
+         }, () => {
+            this._toastrService.error('Falha!', '', Constants.toastrConfig);
          }
       );
    }

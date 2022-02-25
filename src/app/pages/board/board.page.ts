@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject } from 'rxjs';
 import { BoardService } from 'src/app/core/services/board.service';
 import { fadeInAnimation } from 'src/app/shared/animations/fade-in.animation';
@@ -19,23 +21,26 @@ import { Security } from 'src/app/shared/utils/security.util';
 })
 export class BoardPage implements OnInit {
    public boards: Board[] = [];
-   private wasChanged = new BehaviorSubject<boolean>(false);
+   private _wasChanged = new BehaviorSubject<boolean>(false);
 
    constructor(
-      private boardService: BoardService,
+      private _router: Router,
+      private _matDialog: MatDialog,
+      private _spinner: NgxSpinnerService,
 
-      private router: Router,
-      private matDialog: MatDialog
+      private _boardService: BoardService,
    ) { }
 
    async ngOnInit() {
-      await this.loadData();
+      await this._loadData();
 
-      this.wasChanged.subscribe(changed => changed ? this.loadData() : '');
+      this._wasChanged.subscribe(async changed => changed ? await this._loadData() : '');
    }
 
-   private async loadData() {
-      await this.boardService.getAll()
+   private async _loadData() {
+      this._spinner.show();
+
+      await this._boardService.getAll()
          .toPromise()
          .then((res: any) => {
             this.boards = res;
@@ -48,12 +53,14 @@ export class BoardPage implements OnInit {
       }
 
       this.boards = this.boards.filter(el => el.peopleHigherId === Security.getUser().people.createdById);
+
+      this._spinner.hide();
    }
 
-   navigate = (id) => this.router.navigate([`kanban/${btoa(id)}`]);
+   navigate = (id) => this._router.navigate([`kanban/${btoa(id)}`]);
 
    openDialogAddBoard() {
-      let dialog = this.matDialog.open(AddBoardDialog, {
+      let dialog = this._matDialog.open(AddBoardDialog, {
          width: '500px',
          height: 'auto',
          position: { top: '40px' }
@@ -62,7 +69,7 @@ export class BoardPage implements OnInit {
       dialog.afterClosed().subscribe(result => {
          if (!result) { return; }
 
-         this.wasChanged.next(true);
+         this._wasChanged.next(true);
       });
    }
 }

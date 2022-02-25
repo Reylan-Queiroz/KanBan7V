@@ -12,27 +12,23 @@ import { Constants } from './../../../../utils/constants.util';
    templateUrl: './delete-ticket.dialog.html',
    styleUrls: ['./delete-ticket.dialog.scss']
 })
-export class DeleteTicketDialog implements OnInit {
+export class DeleteTicketDialog {
    @Input() text: string;
 
    constructor(
-      private dialogRef: MatDialogRef<DeleteTicketDialog>,
       @Inject(MAT_DIALOG_DATA) public data: { ticket: Ticket, column: Column },
+      private _dialogRef: MatDialogRef<DeleteTicketDialog>,
 
-      private ticketService: TicketService,
-      private toastrService: ToastrService
+      private _ticketService: TicketService,
+      private _toastrService: ToastrService
    ) { }
 
-   ngOnInit() {
-   }
-
    delete() {
-      this.ticketService.delete(this.data.ticket.id).subscribe(
+      this._ticketService.delete(this.data.ticket.id).subscribe(
          () => {
-            this.toastrService.success('Sucesso!', '', Constants.toastrConfig);
-            this.dialogRef.close();
-         },
-         (error: HttpErrorResponse) => { console.log(error) }
+            this._toastrService.success('Sucesso!', '', Constants.toastrConfig);
+            this._dialogRef.close();
+         }, (error: HttpErrorResponse) => { console.log(error) }
       );
    }
 }

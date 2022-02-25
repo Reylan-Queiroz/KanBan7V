@@ -5,7 +5,6 @@
       </mat-toolbar>
 
       <mat-nav-list>
-
          <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="tree">
             <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
                <li class="mat-tree-node" (click)="navigate(node.id)">
@@ -29,7 +28,6 @@
                </li>
             </mat-nested-tree-node>
          </mat-tree>
-
       </mat-nav-list>
    </mat-sidenav>
 

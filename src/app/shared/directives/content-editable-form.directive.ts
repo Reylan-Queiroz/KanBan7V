@@ -1,16 +1,5 @@
-import {
-   Directive,
-   ElementRef,
-   Renderer2,
-   HostListener,
-   forwardRef,
-   Input,
-   OnInit,
-   HostBinding
-} from '@angular/core';
-
+import { Directive, ElementRef, forwardRef, HostBinding, HostListener, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-
 @Directive({
    selector: '[contenteditable]',
    providers:

@@ -1,43 +1,32 @@
-// Our custom element will be `display: inline` by default. Make it a block and add some spacing.
 :host {
    display: block;
    margin-bottom: 8px;
 }
 
-// Remove Material's margin from the content since we have a row of chips.
 .mat-card-content {
    margin-bottom: 0;
 }
 
-// Spread out the actions content to the left and right.
 .align-end {
    display: flex;
    align-items: center;
    justify-content: flex-end;
 }
 
-// Add some spacing to the chip list
 .mat-chip-list {
    display: block;
    margin-top: 12px;
 }
 
-// Allows for the image to cover the card while preserving its dimensions.
 .mat-card-image {
    object-fit: cover;
    object-position: top;
    max-height: 150px;
 }
 
-// Increase the size of the author's name and add some spacing.
-// .author {
-//   font-size: 14px;
-//   margin-left: 8px;
-// }
-
 .card-ticket {
    position: relative;
-   min-height: 90px;
+   min-height: 80px;
 }
 
 .icon-trash {
@@ -74,7 +63,6 @@
 }
 
 .list-tags {
-   position: absolute;
    top: 0px;
 }
 
@@ -120,10 +108,6 @@ mat-chip.text-light {
    cursor: pointer;
 }
 
-.popover {
-   background: lightgoldenrodyellow;
-}
-
-.tagName{
-   display: none;
+mat-card {
+   padding-top: 5px !important;
 }

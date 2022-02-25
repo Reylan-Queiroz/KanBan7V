@@ -10,7 +10,6 @@ export class CardTicketComponent implements OnInit {
    dateDisplayed: Date;
    background: string = '#dfe1e6';
    textColor: string = 'black';
-   peopleName: string = '';
 
    @Output() edit = new EventEmitter<void>();
    @Output() delete = new EventEmitter<void>();
@@ -58,15 +57,15 @@ export class CardTicketComponent implements OnInit {
       }
 
       if (dueDate.getTime() > today.getTime()) {
-         let expirationDay = dueDate.getUTCDate();
-         let day = today.getUTCDate();
-         let daysDifference = expirationDay - day;
+         const expirationDay = dueDate.getUTCDate();
+         const day = today.getUTCDate();
+         const daysDifference = expirationDay - day;
 
          if (daysDifference <= 2) {
             this.background = '#fff3cd';
             this.textColor = 'black';
 
-            return;
+            //return;
          }
 
          //this.background = '#198754';

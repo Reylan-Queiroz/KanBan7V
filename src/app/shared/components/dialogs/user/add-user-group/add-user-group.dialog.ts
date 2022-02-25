@@ -48,7 +48,7 @@ export class AddUserGroupDialog implements OnInit {
    }
 
    async ngOnInit() {
-      await this.loadData();
+      await this._loadData();
 
       this.filteredPeople$ = this.peopleCtrl.valueChanges.pipe(
          startWith(null),
@@ -58,7 +58,7 @@ export class AddUserGroupDialog implements OnInit {
       );
    }
 
-   private async loadData() {
+   private async _loadData() {
       await this._peopleService.getAll()
          .toPromise()
          .then((res: any) => {
@@ -68,8 +68,8 @@ export class AddUserGroupDialog implements OnInit {
       this._peoples = this._peoples.filter(el => el.createdById === Security.getUser().peopleId);
    }
 
-   onSubmit() {
-      this._groupService.create(this.form.value).subscribe(
+   onSubmit(form) {
+      this._groupService.create(form.value).subscribe(
          (res: any) => {
             this.selectedPeople.forEach(people => {
                this._peopleGroupService.create({ id: 0, peopleId: people.id, groupId: res.id, createdById: Security.getUser().peopleId }).subscribe();

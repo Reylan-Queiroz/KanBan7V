@@ -17,26 +17,24 @@ export class AddBoardDialog {
 
    constructor(
       @Inject(MAT_DIALOG_DATA) public data: { user: User },
-      private dialogRef: MatDialogRef<AddBoardDialog>,
-      private fb: FormBuilder,
+      private _dialogRef: MatDialogRef<AddBoardDialog>,
+      private _fb: FormBuilder,
 
-      private boardService: BoardService,
-      private toastrService: ToastrService,
+      private _boardService: BoardService,
+      private _toastrService: ToastrService,
    ) {
-      this.form = this.fb.group({
+      this.form = this._fb.group({
          name: ['', Validators.required],
       });
    }
 
    onSubmit(form: FormGroup) {
-      if (!form.valid) { return; }
-
       const name = form.value['name'].trim();
 
-      this.boardService.create({ boardId: 0, name: name, peopleHigherId: Security.getUser().people.createdById }).subscribe(
+      this._boardService.create({ boardId: 0, name: name, peopleHigherId: Security.getUser().people.createdById }).subscribe(
          () => {
-            this.toastrService.success('Sucesso!', '', Constants.toastrConfig);
-            this.dialogRef.close('Added');
+            this._toastrService.success('Sucesso!', '', Constants.toastrConfig);
+            this._dialogRef.close('Added');
          }, error => console.log(error)
       );
    }

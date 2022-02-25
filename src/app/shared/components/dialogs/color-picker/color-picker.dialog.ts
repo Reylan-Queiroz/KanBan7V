@@ -13,10 +13,10 @@ export class ColorPickerDialog {
    selectedColor = '';
 
    constructor(
-      private dialogRef: MatDialogRef<ColorPickerDialog>,
-      private fb: FormBuilder
+      private _dialogRef: MatDialogRef<ColorPickerDialog>,
+      private _fb: FormBuilder
    ) {
-      this.form = this.fb.group({
+      this.form = this._fb.group({
          name: ''
       });
    }
@@ -27,6 +27,6 @@ export class ColorPickerDialog {
 
    onSubmit(form: FormGroup) {
       const obj = { code: this.selectedColor, name: form.value['name'] };
-      this.dialogRef.close(obj);
+      this._dialogRef.close(obj);
    }
 }

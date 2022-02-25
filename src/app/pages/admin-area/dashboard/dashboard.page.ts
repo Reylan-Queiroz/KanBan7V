@@ -24,29 +24,28 @@ import { User } from '../../../shared/models/user';
    host: { '[@fadeInAnimation]': '' }
 })
 export class DashboardPage implements OnInit {
-   private wasChanged = new BehaviorSubject<boolean>(false);
-   private currentUser: User = Security.getUser();
+   private _wasChanged = new BehaviorSubject<boolean>(false);
 
    @Output() dataSource = { users: [], userGroup: undefined };
 
    constructor(
+      private _matDialog: MatDialog,
+
       private _peopleService: PeopleService,
       private _userService: UserService,
       private _roleService: RoleService,
       private _groupService: GroupService,
       private _peopleGroupService: PeopleGroupService,
       private _peopleRelationService: PeopleRelationService,
-
-      private _matDialog: MatDialog,
    ) { }
 
    async ngOnInit() {
-      await this.loadData();
+      await this._loadData();
 
-      this.wasChanged.subscribe(async changed => changed ? await this.loadData() : '');
+      this._wasChanged.subscribe(async changed => changed ? await this._loadData() : '');
    }
 
-   private async loadData() {
+   private async _loadData() {
       let peoples: any[] = [];
       let users: any[] = [];
       let roles: RoleModel[] = [];
@@ -94,8 +93,8 @@ export class DashboardPage implements OnInit {
             peopleRelations = response;
          }).catch(error => console.log(error));
 
-      peoples = peoples.filter(el => el.createdById === this.currentUser.peopleId);
-      peopleGroupRes = peopleGroupRes.filter(el => el.createdById === this.currentUser.peopleId);
+      peoples = peoples.filter(el => el.createdById === Security.getUser().peopleId);
+      peopleGroupRes = peopleGroupRes.filter(el => el.createdById === Security.getUser().peopleId);
 
       usersRes.forEach((user: User) => {
          if (!peoples.find(el => el.id === user.peopleId)) {
@@ -107,7 +106,6 @@ export class DashboardPage implements OnInit {
 
          users.push(user);
       });
-
 
       peopleGroupRes.forEach(element => {
          if (peoples.length === 0) {
@@ -149,7 +147,7 @@ export class DashboardPage implements OnInit {
       dialog.afterClosed().subscribe((res) => {
          if (!res) return;
 
-         this.wasChanged.next(true);
+         this._wasChanged.next(true);
       });
    }
 
@@ -163,7 +161,7 @@ export class DashboardPage implements OnInit {
       dialog.afterClosed().subscribe((res) => {
          if (!res) return;
 
-         this.wasChanged.next(true);
+         this._wasChanged.next(true);
       });
    }
 }

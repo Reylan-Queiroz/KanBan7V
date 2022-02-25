@@ -8,10 +8,19 @@
          </div>
          <div class="col-4 text-end">
             <div cdkDragHandle>
-               <button mat-icon-button [matMenuTriggerFor]="menu">
-                  <mat-icon>sort</mat-icon>
+               <button mat-icon-button [mat-menu-trigger-for]="menu" #menuTrigger="matMenuTrigger">
+                  <mat-icon>more_horiz</mat-icon>
                </button>
                <mat-menu #menu="matMenu">
+                  <button mat-menu-item [matMenuTriggerFor]="orderBy">Ordernar Pôr</button>
+
+                  <button mat-menu-item (click)="deleteColumn($event, column.id, menuTrigger)">
+                     <mat-icon>delete</mat-icon>
+                     <span>Excluir</span>
+                  </button>
+               </mat-menu>
+
+               <mat-menu #orderBy="matMenu">
                   <button mat-menu-item (click)="filterByDate(column.tickets, 1)">
                      <mat-icon>arrow_downward</mat-icon>
                      <span>Ordenar por(Data)</span>
@@ -21,13 +30,14 @@
                      <span>Ordenar por(Data)</span>
                   </button>
                </mat-menu>
+
                <button mat-icon-button>
                   <mat-icon>drag_handle</mat-icon>
                </button>
             </div>
          </div>
       </div>
-      <div *ngIf="!column['collapsed']" class="card-list-content" cdkDropList [id]="column.id" [cdkDropListData]="column.tickets" [cdkDropListConnectedTo]="connectedToIds(boardIndex)" (cdkDropListDropped)="onTicketDrop($event)">
+      <div class="card-list-content" cdkDropList [id]="column.id" [cdkDropListData]="column.tickets" [cdkDropListConnectedTo]="connectedToIds(boardIndex)" (cdkDropListDropped)="onTicketDrop($event)">
          <app-card-ticket *ngFor="let ticket of column.tickets" cdkDrag [ticket]="ticket" [id]="ticket.id" [tags]="ticket.tags" (edit)="openEditTicketDialog(ticket, column)" (delete)="openDeleteTicketDialog(ticket, column)"></app-card-ticket>
       </div>
       <div fxLayout="row" fxLayoutAlign="baseline baseline">

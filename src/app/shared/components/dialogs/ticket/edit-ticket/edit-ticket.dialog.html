@@ -18,7 +18,6 @@
                   <input placeholder="Responsáveis" #peopleInput [formControl]="peopleCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="matChipConfiguration.addOnBlur" (matChipInputTokenEnd)="addChip($event)">
                </mat-chip-list>
                <mat-autocomplete #auto="matAutocomplete">
-                  <!--(optionSelected)="selectedChip($event)"-->
                   <mat-option *ngFor="let item of filteredPeoplesAndGroups$ | async" [value]="item?.id" (onSelectionChange)="selectedChip(item)">
                      {{item?.name}}
                   </mat-option>
