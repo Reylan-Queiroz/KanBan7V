@@ -28,7 +28,14 @@
                </li>
             </mat-nested-tree-node>
          </mat-tree>
+
+         <li style="list-style: none; margin-left: 40px; font-size: 14px;" *ngIf="getUserRole() < 3">
+            <a [routerLink]="['/dashboard']">
+               Dashboard
+             </a>
+         </li>
       </mat-nav-list>
+
    </mat-sidenav>
 
    <mat-sidenav-content>

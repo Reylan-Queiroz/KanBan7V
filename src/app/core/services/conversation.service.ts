@@ -1,7 +1,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Constants } from 'src/app/shared/utils/constants.util';
+import { environment } from 'src/environments/environment';
 import { CrudInterface } from '../../shared/interfaces/crud-interface';
 
 @Injectable({
@@ -12,11 +12,11 @@ export class ConversationService implements CrudInterface {
    constructor(private http: HttpClient) { }
 
    create(obj: any) {
-      return this.http.post(`${Constants.api}/Conversation/Create`, obj);
+      return this.http.post(`${environment.api}/Conversation/Create`, obj);
    }
 
    getAll() {
-      return this.http.get(`${Constants.api}/Conversation`);
+      return this.http.get(`${environment.api}/Conversation`);
    }
 
    getById(id: number) {
@@ -24,7 +24,7 @@ export class ConversationService implements CrudInterface {
    }
 
    update(id: number, obj: any) {
-      return this.http.put(`${Constants.api}/Conversation/${id}`, obj);
+      return this.http.put(`${environment.api}/Conversation/${id}`, obj);
    }
 
    delete(id: number) {

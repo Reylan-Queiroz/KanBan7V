@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  api: "http://201.39.92.59/kanbanapi/api/v1",
 };

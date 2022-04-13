@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Constants } from 'src/app/shared/utils/constants.util';
+import { environment } from 'src/environments/environment';
 import { CrudInterface } from '../../shared/interfaces/crud-interface';
 
 @Injectable({
@@ -11,22 +11,22 @@ export class TicketFileService implements CrudInterface {
    constructor(private http: HttpClient) { }
 
    create(obj: any) {
-      return this.http.post(`${Constants.api}/TicketFile/Create`, obj);
+      return this.http.post(`${environment.api}/TicketFile/Create`, obj);
    }
 
    getAll() {
-      return this.http.get(`${Constants.api}/TicketFile`);
+      return this.http.get(`${environment.api}/TicketFile`);
    }
 
    getById(id: number) {
-      return this.http.get(`${Constants.api}/TicketFile/${id}`);
+      return this.http.get(`${environment.api}/TicketFile/${id}`);
    }
 
    update(id: number, obj: any) {
-      return this.http.put(`${Constants.api}/TicketFile/${id}`, obj);
+      return this.http.put(`${environment.api}/TicketFile/${id}`, obj);
    }
 
    delete(id: number) {
-      return this.http.delete(`${Constants.api}/TicketFile/${id}`);
+      return this.http.delete(`${environment.api}/TicketFile/${id}`);
    }
 }

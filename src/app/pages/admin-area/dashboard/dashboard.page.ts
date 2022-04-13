@@ -6,6 +6,7 @@ import { PeopleGroupService } from 'src/app/core/services/peopleGroup.service';
 import { fadeInAnimation } from 'src/app/shared/animations/fade-in.animation';
 import { AddUserGroupDialog } from 'src/app/shared/components/dialogs/user/add-user-group/add-user-group.dialog';
 import { AddUserDialog } from 'src/app/shared/components/dialogs/user/add-user/add-user.dialog';
+import { ChangePasswordDialog } from 'src/app/shared/components/dialogs/user/change-password/change-password.dialog';
 import { RoleModel } from 'src/app/shared/models/RoleModel';
 import { Security } from 'src/app/shared/utils/security.util';
 import { GroupService } from '../../../core/services/group.service';
@@ -46,6 +47,7 @@ export class DashboardPage implements OnInit {
    }
 
    private async _loadData() {
+      //const [peopleList] = await Promise.all([this._peopleService.getAll()]);
       let peoples: any[] = [];
       let users: any[] = [];
       let roles: RoleModel[] = [];
@@ -126,9 +128,8 @@ export class DashboardPage implements OnInit {
             peopleGroup.peoples.push(element.people);
          });
 
-         if (peopleGroup.peoples.length === 0) {
-            return;
-         }
+         if (peopleGroup.peoples.length === 0) return;
+
 
          peopleGroups.push(peopleGroup);
       });
@@ -137,8 +138,8 @@ export class DashboardPage implements OnInit {
       this.dataSource.userGroup = peopleGroups;
    }
 
-   openAddUserDialog() {
-      const dialog = this._matDialog.open(AddUserDialog, {
+   private _openDialog(component) {
+      const dialog = this._matDialog.open(component, {
          width: '350px',
          height: 'auto',
          position: { top: '40px' },
@@ -151,17 +152,11 @@ export class DashboardPage implements OnInit {
       });
    }
 
+   openAddUserDialog() {
+      this._openDialog(AddUserDialog);
+   }
+
    openAddUserGroupDialog() {
-      const dialog = this._matDialog.open(AddUserGroupDialog, {
-         width: '350px',
-         height: 'auto',
-         position: { top: '40px' },
-      });
-
-      dialog.afterClosed().subscribe((res) => {
-         if (!res) return;
-
-         this._wasChanged.next(true);
-      });
+      this._openDialog(AddUserGroupDialog);
    }
 }

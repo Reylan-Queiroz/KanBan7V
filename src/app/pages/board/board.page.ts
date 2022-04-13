@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject } from 'rxjs';
 import { BoardService } from 'src/app/core/services/board.service';
+import { UserService } from 'src/app/core/services/user.service';
 import { fadeInAnimation } from 'src/app/shared/animations/fade-in.animation';
 import { AddBoardDialog } from 'src/app/shared/components/dialogs/board/add-board/add-board.dialog';
+import { ChangePasswordDialog } from 'src/app/shared/components/dialogs/user/change-password/change-password.dialog';
 import { Role } from 'src/app/shared/enums/role.enum';
 import { Board } from 'src/app/shared/models/board';
 import { Security } from 'src/app/shared/utils/security.util';
@@ -20,8 +21,8 @@ import { Security } from 'src/app/shared/utils/security.util';
    host: { '[@fadeInAnimation]': '' }
 })
 export class BoardPage implements OnInit {
-   public boards: Board[] = [];
    private _wasChanged = new BehaviorSubject<boolean>(false);
+   boards: Board[] = [];
 
    constructor(
       private _router: Router,
@@ -32,6 +33,9 @@ export class BoardPage implements OnInit {
    ) { }
 
    async ngOnInit() {
+      if (Security.getUser().password == '1')
+         this._router.navigate(['mudarSenha'])
+
       await this._loadData();
 
       this._wasChanged.subscribe(async changed => changed ? await this._loadData() : '');

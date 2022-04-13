@@ -9,5 +9,7 @@ import { Security } from 'src/app/shared/utils/security.util';
 export class ManagerGuard implements CanActivate {
    constructor(private _router: Router) { }
 
-   canActivate = () => { return Security.isInRole([Role.Management, Role.Master]); }
+   canActivate = (): boolean => {
+      return Security.isInRole([Role.Management, Role.Master]);;
+   }
 }

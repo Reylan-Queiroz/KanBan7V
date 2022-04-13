@@ -13,6 +13,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { ToastrModule } from 'ngx-toastr';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { ChangePasswordPage } from './pages/admin-area/change-password/change-password.page';
 import { DashboardPage } from './pages/admin-area/dashboard/dashboard.page';
 import { UserGroupDashboardComponent } from './pages/admin-area/dashboard/user-group-dashboard/user-group-dashboard.component';
 import { UsersDashboardComponent } from './pages/admin-area/dashboard/users-dashboard/users-dashboard.component';
@@ -30,9 +31,12 @@ import { TicketDatesComponent } from './shared/components/dialogs/ticket/edit-ti
 import { TicketTransferComponent } from './shared/components/dialogs/ticket/edit-ticket/ticket-transfer/ticket-transfer.component';
 import { AddUserGroupDialog } from './shared/components/dialogs/user/add-user-group/add-user-group.dialog';
 import { AddUserDialog } from './shared/components/dialogs/user/add-user/add-user.dialog';
+import { ChangePasswordDialog } from './shared/components/dialogs/user/change-password/change-password.dialog';
 import { DrawerComponent } from './shared/components/drawer/drawer.component';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
+import { ContentEditableFormDirective } from './shared/directives/content-editable-form.directive';
 import { DisableDirective } from './shared/directives/disable.directive';
+import { DndDirective } from './shared/directives/dnd.directive';
 import { FilterPipe } from './shared/pipes/filter.pipe';
 
 registerLocaleData(localePt, 'pt');
@@ -46,6 +50,7 @@ registerLocaleData(localePt, 'pt');
       LoginPage,
       BoardPage,
       DashboardPage,
+      ChangePasswordPage,
 
       //Components
       CardTicketComponent,
@@ -65,12 +70,15 @@ registerLocaleData(localePt, 'pt');
       AddTagDialog,
       AddUserDialog,
       AddUserGroupDialog,
+      ChangePasswordDialog,
 
       //Pipes
       FilterPipe,
 
       //Directives
       DisableDirective,
+      DndDirective,
+      ContentEditableFormDirective,
    ],
    imports: [
       BrowserModule,
@@ -99,7 +107,6 @@ registerLocaleData(localePt, 'pt');
       MatOptionModule,
       MatSelectModule,
       MatTooltipModule,
-      MatOptionModule,
       MatDatepickerModule,
       MatNativeDateModule,
       MatExpansionModule,
@@ -121,7 +128,8 @@ registerLocaleData(localePt, 'pt');
       ColorPickerDialog,
       AddTagDialog,
       AddUserDialog,
-      AddUserGroupDialog
+      AddUserGroupDialog,
+      ChangePasswordDialog
    ],
    providers: [
       DatePipe,

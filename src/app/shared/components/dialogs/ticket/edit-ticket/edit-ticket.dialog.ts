@@ -524,7 +524,6 @@ export class EditTicketDialog implements OnInit {
 
       dialogRef.afterClosed().subscribe(
          (result) => {
-            debugger;
             if (!result) return;
 
             this.wasChanged.next(true);

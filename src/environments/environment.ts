@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+   production: false,
+   api: "http://201.39.92.59/kanbanapi/api/v1",
+   //api: "http://localhost:5151/api/v1",
 };
 
 /*

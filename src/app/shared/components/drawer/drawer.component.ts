@@ -8,6 +8,7 @@ import { map } from 'rxjs/operators';
 import { MatTreeNestedDataSource } from '@angular/material';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { fadeInAnimation } from '../../animations/fade-in.animation';
+import { Role } from '../../enums/role.enum';
 
 @Component({
    selector: 'app-drawer',
@@ -57,4 +58,8 @@ export class DrawerComponent implements OnInit {
 
    hasChild = (_: number, node: any) => !!node.children && node.children.length > 0;
    navigate = (boardId: any) => this._router.navigate([`/kanban/${btoa(boardId)}`]);
+
+   getUserRole(): number {
+      return Security.getUser().roleId;
+   }
 }

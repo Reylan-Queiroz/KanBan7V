@@ -2,15 +2,22 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatMenu, MatMenuTrigger } from '@angular/material';
+import { MatMenuTrigger } from '@angular/material';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject } from 'rxjs';
+import { AssignedToService } from 'src/app/core/services/assignedTo.service';
+import { ColorService } from 'src/app/core/services/color.service';
 import { ColumnService } from 'src/app/core/services/column.service';
 import { DataService } from 'src/app/core/services/data.service';
+import { GroupService } from 'src/app/core/services/group.service';
+import { PeopleService } from 'src/app/core/services/people.service';
+import { PeopleGroupService } from 'src/app/core/services/peopleGroup.service';
+import { TagService } from 'src/app/core/services/tag.service';
 import { TicketService } from 'src/app/core/services/ticket.service';
+import { TicketTagsService } from 'src/app/core/services/ticketTags.service';
 import { fadeInAnimation } from 'src/app/shared/animations/fade-in.animation';
 import { AddTicketDialog } from 'src/app/shared/components/dialogs/ticket/add-ticket/add-ticket.dialog';
 import { DeleteTicketDialog } from 'src/app/shared/components/dialogs/ticket/delete-ticket/delete-ticket.dialog';
@@ -50,6 +57,14 @@ export class KanbanPage implements OnInit {
       private _toastrService: ToastrService,
       private _columnService: ColumnService,
       private _ticketService: TicketService,
+      private _colorService: ColorService,
+      private _tagService: TagService,
+      private _ticketTagsService: TicketTagsService,
+      private _assignedToService: AssignedToService,
+      private _groupService: GroupService,
+      private _peopleGroupService: PeopleGroupService,
+      private _peopleService: PeopleService,
+
       private _dataService: DataService,
    ) {
       this.formColumn = this._fb.group({
@@ -143,17 +158,15 @@ export class KanbanPage implements OnInit {
                   });
 
                   assignedTo.forEach(element => {
-                     if (element.ticketId !== elTicket.id) { return; }
+                     if (element.ticketId !== elTicket.id) return;
 
                      let item: any;
 
-                     if (element.peopleId !== null) {
+                     if (element.peopleId !== null)
                         item = peoples.find(el => el.id === element.peopleId);
-                     }
 
-                     if (element.groupId !== null) {
+                     if (element.groupId !== null)
                         item = groups.find(el => el.id === element.groupId);
-                     }
 
                      item.assignedToId = (element.id);
                      elTicket.assignedTo.push(item);
@@ -173,6 +186,57 @@ export class KanbanPage implements OnInit {
       this._spinner.hide();
    }
 
+   private _addData(service: any, model: any, showToastrSuccess: boolean, updateGrid: boolean = false): void {
+      service
+         .create(model)
+         .subscribe(
+            () => {
+               if (showToastrSuccess)
+                  this._toastrService.success('', 'Êxito', Constants.toastrConfig);
+
+               if (updateGrid)
+                  this._wasChanged.next(true);
+
+            }, (error: HttpErrorResponse) => {
+               this._toastrService.error(error.message, `Error ${error.status}`, Constants.toastrConfig);
+            }
+         );
+   }
+
+   private _updateData(service: any, model: any, showToastrSuccess: boolean, updateGrid: boolean = false): void {
+      service
+         .update(Number.parseInt(model.id), model)
+         .subscribe(
+            () => {
+               if (showToastrSuccess)
+                  this._toastrService.success('', 'Êxito', Constants.toastrConfig);
+
+               if (updateGrid)
+                  this._wasChanged.next(true);
+
+            }, (error: HttpErrorResponse) => {
+               this._toastrService.error(error.message, `Error ${error.status}`, Constants.toastrConfig);
+            }
+         );
+   }
+
+   private _deleteData(service: any, modelId: number, showToastrSuccess: boolean, updateGrid: boolean = false): void {
+      service
+         .delete(modelId)
+         .subscribe(
+            () => {
+               if (showToastrSuccess)
+                  this._toastrService.success('', 'Êxito', Constants.toastrConfig);
+
+               if (updateGrid)
+                  this._wasChanged.next(true);
+
+            }, (error: HttpErrorResponse) => {
+               this._toastrService.error(error.message, `Error ${error.status}`, Constants.toastrConfig);
+            }
+         );
+   }
+
    connectedToIds = (index): string[] => {
       return this.data[index].columnsAndTickets.map(el =>
          el.id
@@ -182,11 +246,13 @@ export class KanbanPage implements OnInit {
    onColumnDrop(event: CdkDragDrop<any[]>) {
       let currentItemDrop: Column = event.container.data[event.previousIndex];
       currentItemDrop.position = event.currentIndex;
-      this._columnService.update(Number.parseInt(currentItemDrop.id), currentItemDrop).subscribe();
+
+      this._updateData(this._columnService, currentItemDrop, false);
 
       let previousItemDrop: Column = event.container.data[event.currentIndex];
       previousItemDrop.position = event.previousIndex;
-      this._columnService.update(Number.parseInt(previousItemDrop.id), previousItemDrop).subscribe();
+
+      this._updateData(this._columnService, previousItemDrop, false);
 
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
    }
@@ -196,13 +262,12 @@ export class KanbanPage implements OnInit {
          let currentItemDrop: Ticket = event.container.data[event.previousIndex];
          currentItemDrop.position = event.currentIndex;
 
-         this._ticketService.update(currentItemDrop.id, currentItemDrop).subscribe();
+         this._updateData(this._ticketService, currentItemDrop, false);
 
-         let previousItemDrop: Column = event.container.data[event.currentIndex];
+         let previousItemDrop: Ticket = event.container.data[event.currentIndex];
          previousItemDrop.position = event.previousIndex;
 
-
-         this._ticketService.update(previousItemDrop.id, previousItemDrop).subscribe();
+         this._updateData(this._ticketService, previousItemDrop, false);
 
          moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
       } else {
@@ -214,7 +279,7 @@ export class KanbanPage implements OnInit {
          ticket.columnId = columnId;
          ticket.position = newPosition;
 
-         this._ticketService.update(ticket.id, ticket).subscribe();
+         this._updateData(this._ticketService, ticket, false);
 
          transferArrayItem(
             event.previousContainer.data,
@@ -231,15 +296,9 @@ export class KanbanPage implements OnInit {
       let text = element.children[1];
 
       if (element.classList.contains('in-exclusion')) {
-         this._columnService.delete(columnId).subscribe(() => {
-            this._toastrService.success('Sucesso!', '', Constants.toastrConfig);
+         this._deleteData(this._columnService, columnId, true, true);
 
-            menuTrigger.closeMenu();
-
-            this._wasChanged.next(true);
-         }, (error) => {
-            console.log(error)
-         });
+         menuTrigger.closeMenu();
       }
 
       element.classList.add('in-exclusion');
@@ -266,7 +325,7 @@ export class KanbanPage implements OnInit {
       });
 
       dialog.afterClosed().subscribe((result) => {
-         if (!result) { return; }
+         if (!result) return;
 
          this._wasChanged.next(true);
       });
@@ -310,26 +369,18 @@ export class KanbanPage implements OnInit {
       const name = this.formColumn.controls['nameColumn'].value.trim();
       const position = this.columnsAndTickets.length;
 
-      if (name.length < 3) { return; }
+      if (name.length < 3) return;
 
       let column = new Column(0, name, position, this._boardId, null, []);
 
-      this._columnService.create(column).subscribe(
-         () => {
-            this._toastrService.success('Coluna criada com sucesso.', 'Êxito', Constants.toastrConfig);
-
-            this._wasChanged.next(true);
-         },
-         (error: HttpErrorResponse) => {
-            this._toastrService.error(error.message, `Error ${error.status}`, Constants.toastrConfig);
-         });
+      this._addData(this._columnService, column, true, true);
 
       this.formColumn.controls['nameColumn'].setValue(null);
    }
 
    editColumnName(event: FocusEvent, column: Column) {
       const element: HTMLElement = (<HTMLElement>event.target);
-      const newTitle = element.innerText.trim();
+      const newTitle = element.textContent.trim();
 
       if (newTitle.length > 18) {
          this._toastrService.error('O nome excedeu o limite de caracteres(18).', 'Erro', Constants.toastrConfig);
@@ -339,16 +390,10 @@ export class KanbanPage implements OnInit {
          return;
       }
 
-      if (newTitle === column.title) { return; }
+      if (newTitle === column.title) return;
 
       column.title = newTitle;
 
-      this._columnService.update(Number.parseInt(column.id), column).subscribe(
-         () => {
-            this._toastrService.success('Nome alterado com sucesso.', 'Êxito', Constants.toastrConfig);
-         }, (error: HttpErrorResponse) => {
-            this._toastrService.error(error.message, `Error ${error.status}`, Constants.toastrConfig);
-         }
-      );
+      this._updateData(this._columnService, column, true);
    }
 }

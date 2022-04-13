@@ -6,9 +6,6 @@
       <input matInput placeholder="Login" required formControlName="login">
    </mat-form-field>
    <mat-form-field>
-      <input matInput placeholder="Senha" required formControlName="password">
-   </mat-form-field>
-   <mat-form-field>
       <mat-label>Função</mat-label>
       <mat-select required formControlName="role">
          <mat-option *ngFor="let role of roles" [value]="role.id">

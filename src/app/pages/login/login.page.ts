@@ -6,10 +6,9 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { LoginService } from 'src/app/core/services/login.service';
 import { fadeInAnimation } from 'src/app/shared/animations/fade-in.animation';
-import { RoleModel } from 'src/app/shared/models/RoleModel';
+import { User } from 'src/app/shared/models/user';
 import { Constants } from 'src/app/shared/utils/constants.util';
 import { Security } from 'src/app/shared/utils/security.util';
-import { RoleService } from '../../core/services/role.service';
 
 @Component({
    selector: 'app-login',
@@ -25,9 +24,9 @@ export class LoginPage implements OnInit {
    constructor(
       private _fb: FormBuilder,
       private _router: Router,
-      private _spinner: NgxSpinnerService,
-      private _toastr: ToastrService,
 
+      private _toastr: ToastrService,
+      private _spinner: NgxSpinnerService,
       private _loginService: LoginService,
    ) {
       this.form = this._fb.group({
@@ -69,8 +68,12 @@ export class LoginPage implements OnInit {
       );
    }
 
-   private _setUser(user, token) {
+   private _setUser(user: User, token) {
       Security.set(user, token);
-      this._router.navigate(['/']);
+
+      if (user.password == '1')
+         this._router.navigate(['/mudarSenha']);
+      else
+         this._router.navigate(['/']);
    }
 }
