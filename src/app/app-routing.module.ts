@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthorizedGuard } from './core/guards/authorized.guard';
 import { ManagerGuard } from './core/guards/manager.guard';
+import { ChecklistPage } from './pages/admin-area/checklist/checklist.page';
 import { DashboardPage } from './pages/admin-area/dashboard/dashboard.page';
 import { BoardPage } from './pages/board/board.page';
 import { KanbanPage } from './pages/kanban/kanban.page';
@@ -24,6 +25,14 @@ const routes: Routes = [
       canActivate: [ManagerGuard],
       children: [
          { path: '', component: DashboardPage },
+      ],
+      component: DrawerComponent
+   },
+   {
+      path: 'checklist',
+      canActivate: [ManagerGuard],
+      children: [
+         { path: '', component: ChecklistPage },
       ],
       component: DrawerComponent
    },

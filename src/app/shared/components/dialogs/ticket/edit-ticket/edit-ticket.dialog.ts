@@ -2,7 +2,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatAutocomplete, MatCheckboxChange } from '@angular/material';
+import { MatAutocomplete, MatCheckboxChange, MatExpansionPanel } from '@angular/material';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -32,6 +32,7 @@ import { PeopleGroup } from 'src/app/shared/models/peopleGroup';
 import { Tag } from 'src/app/shared/models/tag';
 import { Ticket } from 'src/app/shared/models/ticket';
 import { User } from 'src/app/shared/models/user';
+import { AddChecklistDialog } from '../../checklist/add-checklist/add-checklist.dialog';
 import { AddTagDialog } from '../../tag/add-tag/add-tag.dialog';
 import { Security } from './../../../../utils/security.util';
 
@@ -114,7 +115,7 @@ export class EditTicketDialog implements OnInit {
          )
       );
    }
-
+   panelOpenState = false;
    private async loadData() {
       this._spinner.show();
 
@@ -552,5 +553,16 @@ export class EditTicketDialog implements OnInit {
       downloadLink.download = fileName;
       downloadLink.click();
       downloadLink.remove();
+   }
+
+   openAddChecklistDialog(event) {
+      event.stopPropagation();
+
+      const dialogRef = this.matDialog.open(AddChecklistDialog, {
+         width: '350px',
+         position: { top: '40px' },
+         data: {},
+         disableClose: false
+      });
    }
 }

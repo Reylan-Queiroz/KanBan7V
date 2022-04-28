@@ -35,18 +35,14 @@ export class AddUserDialog implements OnInit {
             Validators.minLength(3),
             Validators.required
          ])],
-         password: ['', Validators.compose([
-            Validators.minLength(1),
-            Validators.required
-         ])],
          role: ['', Validators.compose([
             Validators.required
          ])]
       });
    }
 
-   ngOnInit() {
-      this.loadData();
+   async ngOnInit() {
+      await this.loadData();
    }
 
    private async loadData() {
@@ -68,7 +64,7 @@ export class AddUserDialog implements OnInit {
          (response: People) => {
             if (!response) return;
 
-            let user = { id: 0, login: form.value['login'], password: form.value['password'], roleId: form.value['role'], peopleId: response.id };
+            let user = { id: 0, login: form.value['login'], password: '1', roleId: form.value['role'], peopleId: response.id };
 
             this._userService.create(user).subscribe(
                () => {

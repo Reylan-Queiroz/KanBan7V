@@ -280,7 +280,6 @@ export class KanbanPage implements OnInit {
          width: '75%',
          height: 'auto',
          position: { top: '40px' },
-         panelClass: 'trend-dialog', // class that disables overflow-y
          data: { ticket, column, user, boardId },
       });
 

@@ -1,0 +1,7 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit(form)">
+   <mat-form-field class="w-100">
+      <input matInput placeholder="Nova senha" formControlName="newPassword">
+   </mat-form-field>
+
+   <button type="submit" class="float-end" mat-raised-button [disabled]="form.invalid">Confirmar</button>
+</form>

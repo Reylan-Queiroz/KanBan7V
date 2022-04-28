@@ -1,0 +1,20 @@
+<mat-form-field>
+   <mat-label>Selecione o template</mat-label>
+   <mat-select>
+      <!-- <mat-option *ngFor="let food of foods" [value]="food.value">
+         {{food.viewValue}}
+      </mat-option> -->
+   </mat-select>
+</mat-form-field>
+
+<mat-form-field>
+   <input matInput [ngxMatDatetimePicker]="picker" placeholder="Data de inicio"> <!--[(ngModel)]="dueDate" (dateChange)="addDueDate($event)"-->
+   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+   <ngx-mat-datetime-picker #picker>
+      <ng-template>
+         <span>OK</span>
+      </ng-template>
+   </ngx-mat-datetime-picker>
+</mat-form-field>
+
+<button mat-raised-button>Confirmar</button>
