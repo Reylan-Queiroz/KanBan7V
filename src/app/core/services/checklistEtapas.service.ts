@@ -9,22 +9,22 @@ export class ChecklistEtapasService {
    constructor(private http: HttpClient) { }
 
    create(obj: any) {
-      return this.http.post(`${Constants.api}/Checklist/Create`, obj);
+      return this.http.post(`${Constants.api}/ChecklistEtapas/Create`, obj);
    }
 
    getAll() {
-      return this.http.get(`${Constants.api}/Checklist`);
+      return this.http.get(`${Constants.api}/ChecklistEtapas`);
    }
 
    getById(id: number) {
-      return this.http.get(`${Constants.api}/Checklist/${id}`);
+      return this.http.get(`${Constants.api}/ChecklistEtapas/${id}`);
    }
 
    update(id: number, obj: any) {
-      return this.http.put(`${Constants.api}/Checklist/${id}`, obj);
+      return this.http.put(`${Constants.api}/ChecklistEtapas/${id}`, obj);
    }
 
    delete(id: number) {
-      return this.http.delete(`${Constants.api}/Checklist/${id}`);
+      return this.http.delete(`${Constants.api}/ChecklistEtapas/${id}`);
    }
 }

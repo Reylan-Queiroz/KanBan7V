@@ -17,6 +17,8 @@ export class ChecklistPage {
 
    @ViewChild(TreeComponent, { static: true }) private _tree: TreeComponent;
 
+   checkListNameCtrl = new FormControl();
+
    // state: ITreeState = {
    //    expandedNodeIds: {
    //       1: true,
@@ -78,7 +80,8 @@ export class ChecklistPage {
    }
 
    onSubmit() {
-      const checklist = new Checklist(0, '', this.itensCategorizados);
+      const checklistName = this.checkListNameCtrl.value;
+      const checklist = new Checklist(0, checklistName, this.itensCategorizados);
 
       this._checklistService
          .createAll(checklist)

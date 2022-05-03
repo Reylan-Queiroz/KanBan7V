@@ -11,6 +11,8 @@ import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { map, startWith } from 'rxjs/operators';
 import { AssignedToService } from 'src/app/core/services/assignedTo.service';
+import { ChecklistService } from 'src/app/core/services/checklist.service';
+import { ChecklistEtapasService } from 'src/app/core/services/checklistEtapas.service';
 import { ColorService } from 'src/app/core/services/color.service';
 import { ColumnService } from 'src/app/core/services/column.service';
 import { ConversationService } from 'src/app/core/services/conversation.service';
@@ -24,6 +26,8 @@ import { TicketService } from 'src/app/core/services/ticket.service';
 import { TicketFileService } from 'src/app/core/services/ticketFile.service';
 import { TicketTagsService } from 'src/app/core/services/ticketTags.service';
 import { AssignedTo } from 'src/app/shared/models/assignedTo';
+import { Checklist } from 'src/app/shared/models/checklist';
+import { CheckListEtapa } from 'src/app/shared/models/checkListEtapa';
 import { Column } from 'src/app/shared/models/column';
 import { Conversation } from 'src/app/shared/models/conversation';
 import { FileModel } from 'src/app/shared/models/fileModel';
@@ -67,6 +71,8 @@ export class EditTicketDialog implements OnInit {
    allTags: any = [];
    allTicketFiles: any = [];
 
+   checklists: Checklist[] = [];
+
    filteredPeoplesAndGroups$: Observable<any[]>;
 
    get sortConversation() {
@@ -82,7 +88,7 @@ export class EditTicketDialog implements OnInit {
 
    constructor(
       @Inject(MAT_DIALOG_DATA) public data: { ticket: any, column: Column, user: User, boardId: number },
-      private dialogRef: MatDialogRef<EditTicketDialog>,
+      private _dialogRef: MatDialogRef<EditTicketDialog>,
       private matDialog: MatDialog,
       private _datePipe: DatePipe,
       private _spinner: NgxSpinnerService,
@@ -101,6 +107,8 @@ export class EditTicketDialog implements OnInit {
       private columnService: ColumnService,
       private _groupService: GroupService,
       private _peopleGroupService: PeopleGroupService,
+      private _checklistService: ChecklistService,
+      private _checklistEtapasService: ChecklistEtapasService
    ) { }
 
    async ngOnInit() {
@@ -115,7 +123,7 @@ export class EditTicketDialog implements OnInit {
          )
       );
    }
-   panelOpenState = false;
+
    private async loadData() {
       this._spinner.show();
 
@@ -204,6 +212,32 @@ export class EditTicketDialog implements OnInit {
          .then((response: any) => {
             peopleGroupRes = (response || []);
          }).catch(error => console.log(error));
+
+      await this._checklistService.getAll()
+         .toPromise()
+         .then((response: any) => {
+            //console.log(response);
+
+            this.checklists = response;
+         }).catch(error => console.log(error));
+
+      let checklistEtapas: CheckListEtapa[] = []
+
+      await this._checklistEtapasService.getAll()
+         .toPromise()
+         .then((response: any) => {
+            checklistEtapas = response;
+         }).catch(error => console.log(error));
+
+      this.checklists.forEach(checklist => {
+         let newChecklistEtapa: CheckListEtapa;
+
+         checklist.checkListEtapas.forEach(oldChecklistEtapa => {
+            newChecklistEtapa = checklistEtapas.find(l => l.id == oldChecklistEtapa.id);
+
+            oldChecklistEtapa.children = newChecklistEtapa.children;
+         });
+      });
 
       this.allPeoples = this.allPeoples.filter(el => el.createdById === this._currentUser.people.createdById);
 
