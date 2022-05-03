@@ -211,7 +211,7 @@ export class EditTicketDialog implements OnInit {
          .toPromise()
          .then((response: any) => {
             peopleGroupRes = (response || []);
-         }).catch(error => console.log(error));
+         }).catch(error => console.log(error))
 
       await this._checklistService.getAll()
          .toPromise()
