@@ -4,7 +4,7 @@ export class Checklist {
    constructor(
       public id: number,
       public descricao: string,
-      // public ticketId?: number,
+      public treeStateJson: string,
       public checkListEtapas: CheckListEtapa[] = [],
    ) { }
 }

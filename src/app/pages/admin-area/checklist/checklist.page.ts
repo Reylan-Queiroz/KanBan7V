@@ -19,15 +19,6 @@ export class ChecklistPage {
 
    checkListNameCtrl = new FormControl();
 
-   // state: ITreeState = {
-   //    expandedNodeIds: {
-   //       1: true,
-   //       2: true
-   //    },
-   //    hiddenNodeIds: {},
-   //    activeNodeIds: {}
-   // };
-
    options: ITreeOptions = {
       allowDrag: (node) => node.isLeaf,
       getNodeClone: (node) => ({
@@ -55,6 +46,7 @@ export class ChecklistPage {
             Validators.required,
          ])]
       });
+
    }
 
    onMove(event) {
@@ -64,13 +56,12 @@ export class ChecklistPage {
       let checkListEtapaFilho: CheckListEtapa = event.node;
 
       checkListEtapaFilho.posicao = posicao;
-      checkListEtapaFilho.checkListEtapaPaiId = checkListEtapaPai.id;
 
       console.log("Movido", checkListEtapaFilho.descricao, "para", checkListEtapaPai.descricao, "no index", event.to.index);
    }
 
    addTarefa(form: FormGroup) {
-      let itemNaoCategorizado = new CheckListEtapa(0, form.value['nomeTarefa'], [], 0, 0, new Date(), null);
+      let itemNaoCategorizado = new CheckListEtapa(0, form.value['nomeTarefa'], [], false, 0, new Date(), null);
 
       this.itensNaoCategorizados.push(itemNaoCategorizado);
 
@@ -81,7 +72,7 @@ export class ChecklistPage {
 
    onSubmit() {
       const checklistName = this.checkListNameCtrl.value;
-      const checklist = new Checklist(0, checklistName, this.itensCategorizados);
+      const checklist = new Checklist(0, checklistName, '', this.itensCategorizados);
 
       this._checklistService
          .createAll(checklist)

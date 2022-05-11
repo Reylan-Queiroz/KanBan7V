@@ -2,7 +2,7 @@
    <div class="col-12 mb-3">
       <span class="float-end" style="cursor: pointer" [mat-dialog-close]="data.ticket"><i class="fas fa-times"></i></span>
    </div>
-   <div class="col-8 custom-height">
+   <div class="col-8 custom-height" id="col-principal">
       <div class="rounded-top p-1 px-2" style="background-color: rgb(194, 199, 204);">
          <small>{{data.ticket.title}}</small>
          <small class="float-end">#{{data.ticket.id}}</small>
@@ -59,17 +59,19 @@
                <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
                   <mat-expansion-panel-header>
                      <mat-panel-title>
-                        Checklist <span class="badge badge-dark text-dark">{{data.ticket.files.length}}</span>
+                        Checklist <!-- <span class="badge badge-dark text-dark">{{data.ticket.files.length}}</span> -->
                      </mat-panel-title>
                      <span style="margin-right: 50px;">
-                        <button mat-icon-button (click)="openAddChecklistDialog($event)">
+                        <button mat-icon-button (click)="openAddChecklistDialog($event)" [disabled]="checklist">
                            <mat-icon>add</mat-icon>
                         </button>
                      </span>
                   </mat-expansion-panel-header>
 
                   <div class="checklist">
+                     <tree-root *ngIf="checklist?.checkListEtapas" #tree [(state)]="state" [options]="options" [nodes]="checklist?.checkListEtapas">
 
+                     </tree-root>
                   </div>
                </mat-expansion-panel>
             </mat-accordion>
@@ -132,7 +134,7 @@
          </div>
       </div>
    </div>
-   <div class="col-4">
+   <div class="col-4" id="col-secundaria">
       <div class="row">
          <div class="col-12" style="height: calc(90vh - 449px);">
             <div class="rounded-top p-1 px-2 " style="background-color: rgb(194, 199, 204);">
@@ -167,3 +169,7 @@
       </div>
    </div>
 </div>
+
+<button mat-icon-button style="position: absolute; right: 35%; top: 70px;" (click)="collapseArea()">
+   <mat-icon>more_horiz</mat-icon>
+</button>

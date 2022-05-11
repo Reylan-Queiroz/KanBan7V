@@ -4,7 +4,7 @@ export class CheckListEtapa {
       public descricao: string,
       public children: CheckListEtapa[],
 
-      public checkListEtapaPaiId: number, //FK
+      public checked: boolean,
       public posicao: number,
       public prazo: Date,
       public dataConclusao?: Date,
