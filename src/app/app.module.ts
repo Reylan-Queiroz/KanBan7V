@@ -8,19 +8,24 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatBadgeModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatChipsModule, MatDatepickerModule, MatDialogModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatOptionModule, MatProgressSpinnerModule, MatSelectModule, MatSidenavModule, MatTableModule, MatToolbarModule, MatTooltipModule, MatTreeModule, MAT_DATE_LOCALE } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TreeModule } from 'angular-tree-component';
 import { ColorChromeModule } from 'ngx-color/chrome';
+import { NestableModule } from 'ngx-nestable';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ToastrModule } from 'ngx-toastr';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { ChecklistPage } from './pages/admin-area/checklist/checklist.page';
 import { DashboardPage } from './pages/admin-area/dashboard/dashboard.page';
 import { UserGroupDashboardComponent } from './pages/admin-area/dashboard/user-group-dashboard/user-group-dashboard.component';
 import { UsersDashboardComponent } from './pages/admin-area/dashboard/users-dashboard/users-dashboard.component';
+import { MudarSenhaComponent } from './shared/components/dialogs/user/mudar-senha/mudar-senha.component';
 import { BoardPage } from './pages/board/board.page';
 import { KanbanPage } from './pages/kanban/kanban.page';
 import { LoginPage } from './pages/login/login.page';
 import { CardTicketComponent } from './shared/components/card-ticket/card-ticket.component';
 import { AddBoardDialog } from './shared/components/dialogs/board/add-board/add-board.dialog';
+import { AddChecklistDialog } from './shared/components/dialogs/checklist/add-checklist/add-checklist.dialog';
 import { ColorPickerDialog } from './shared/components/dialogs/color-picker/color-picker.dialog';
 import { AddTagDialog } from './shared/components/dialogs/tag/add-tag/add-tag.dialog';
 import { AddTicketDialog } from './shared/components/dialogs/ticket/add-ticket/add-ticket.dialog';
@@ -46,6 +51,7 @@ registerLocaleData(localePt, 'pt');
       LoginPage,
       BoardPage,
       DashboardPage,
+      ChecklistPage,
 
       //Components
       CardTicketComponent,
@@ -55,6 +61,7 @@ registerLocaleData(localePt, 'pt');
       UserGroupDashboardComponent,
       TicketTransferComponent,
       TicketDatesComponent,
+      MudarSenhaComponent,
 
       //Dialogs
       EditTicketDialog,
@@ -65,6 +72,7 @@ registerLocaleData(localePt, 'pt');
       AddTagDialog,
       AddUserDialog,
       AddUserGroupDialog,
+      AddChecklistDialog,
 
       //Pipes
       FilterPipe,
@@ -82,6 +90,8 @@ registerLocaleData(localePt, 'pt');
       ToastrModule.forRoot(),
       DragDropModule,
       ColorChromeModule,
+      NestableModule,
+      TreeModule.forRoot(),
 
       MatFormFieldModule,
       MatDialogModule,
@@ -121,7 +131,9 @@ registerLocaleData(localePt, 'pt');
       ColorPickerDialog,
       AddTagDialog,
       AddUserDialog,
-      AddUserGroupDialog
+      AddUserGroupDialog,
+      AddChecklistDialog,
+      MudarSenhaComponent
    ],
    providers: [
       DatePipe,

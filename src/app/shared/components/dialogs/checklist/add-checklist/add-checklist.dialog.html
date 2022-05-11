@@ -1,0 +1,22 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit(form)">
+   <mat-form-field>
+      <mat-label>Selecione o template</mat-label>
+      <mat-select formControlName="templateId">
+         <mat-option *ngFor="let checklist of checklists" [value]="checklist.id">
+            {{checklist.descricao}}
+         </mat-option>
+      </mat-select>
+   </mat-form-field>
+
+   <mat-form-field>
+      <input matInput [ngxMatDatetimePicker]="picker" placeholder="Data de inicio" formControlName="dataInicio"> <!--[(ngModel)]="dueDate" (dateChange)="addDueDate($event)"-->
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <ngx-mat-datetime-picker #picker>
+         <ng-template>
+            <span>OK</span>
+         </ng-template>
+      </ngx-mat-datetime-picker>
+   </mat-form-field>
+
+   <button type="submit" mat-raised-button [disabled]="form.invalid">Confirmar</button>
+</form>

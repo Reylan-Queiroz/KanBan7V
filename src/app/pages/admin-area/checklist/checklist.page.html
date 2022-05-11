@@ -1,0 +1,58 @@
+<div class="container">
+   <div class="row">
+      <div class="col-12 rounded shadow p-4 mt-4" style="height: 80vh;">
+         <div class="row">
+            <div class="col-6" style="height: 80%;">
+               <div class="row">
+                  <div class="col-6">
+                     <input type="text" placeholder="Insira o nome do checklist" class="form-control form-control-sm" [formControl]="checkListNameCtrl" #inp_nameChecklist>
+                  </div>
+                  <div class="col-6"></div>
+
+                  <div class="col-12">
+                     <hr>
+                  </div>
+
+                  <form class="row" [formGroup]="form" (ngSubmit)="addTarefa(form)">
+                     <div class="col-8">
+                        <input type="text" placeholder="Insira o nome da tarefa" class="form-control form-control-sm" formControlName="nomeTarefa">
+                     </div>
+                     <div class="col-4">
+                        <button type="submit" class="btn btn-success btn-sm" [disabled]="form.invalid">Criar</button>
+                     </div>
+                  </form>
+
+                  <span class="mt-3"></span>
+
+                  <div class="example-container">
+                     <h4>Itens não categorizados</h4>
+
+                     <tree-root #tree [options]="options" [focused]="true" [nodes]="itensNaoCategorizados" (moveNode)="onMove($event)"></tree-root>
+                  </div>
+               </div>
+            </div>
+            <div class="col-6" style="height: 50vh;">
+               <div class="row">
+
+                  <div class="col-12">
+                     <h4>Itens categorizados</h4>
+
+                     <tree-root [options]="options" [focused]="true" [nodes]="itensCategorizados" (moveNode)="onMove($event)"></tree-root>
+                  </div>
+
+               </div>
+            </div>
+
+            <div class="col-6"></div>
+
+            <div class="col-6 border rounded mb-3" style="height: 15vh;">
+
+            </div>
+
+            <div class="col-12 text-end">
+               <button type="button" class="btn btn-success" style="width: 160px;" [disabled]="inp_nameChecklist.value.length < 3" (click)="onSubmit()">Avançar</button>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

@@ -2,15 +2,20 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatAutocomplete, MatCheckboxChange } from '@angular/material';
+import { MatAutocomplete, MatCheckboxChange, MatExpansionPanel } from '@angular/material';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ITreeOptions } from 'angular-tree-component';
+import { ITreeModel } from 'angular-tree-component/dist/defs/api';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { map, startWith } from 'rxjs/operators';
 import { AssignedToService } from 'src/app/core/services/assignedTo.service';
+import { ChecklistService } from 'src/app/core/services/checklist.service';
+import { ChecklistEtapasService } from 'src/app/core/services/checklistEtapas.service';
+import { ChecklistForTicketService } from 'src/app/core/services/checklistForTicket.service';
 import { ColorService } from 'src/app/core/services/color.service';
 import { ColumnService } from 'src/app/core/services/column.service';
 import { ConversationService } from 'src/app/core/services/conversation.service';
@@ -24,6 +29,8 @@ import { TicketService } from 'src/app/core/services/ticket.service';
 import { TicketFileService } from 'src/app/core/services/ticketFile.service';
 import { TicketTagsService } from 'src/app/core/services/ticketTags.service';
 import { AssignedTo } from 'src/app/shared/models/assignedTo';
+import { Checklist } from 'src/app/shared/models/checklist';
+import { CheckListEtapa } from 'src/app/shared/models/checkListEtapa';
 import { Column } from 'src/app/shared/models/column';
 import { Conversation } from 'src/app/shared/models/conversation';
 import { FileModel } from 'src/app/shared/models/fileModel';
@@ -32,6 +39,7 @@ import { PeopleGroup } from 'src/app/shared/models/peopleGroup';
 import { Tag } from 'src/app/shared/models/tag';
 import { Ticket } from 'src/app/shared/models/ticket';
 import { User } from 'src/app/shared/models/user';
+import { AddChecklistDialog } from '../../checklist/add-checklist/add-checklist.dialog';
 import { AddTagDialog } from '../../tag/add-tag/add-tag.dialog';
 import { Security } from './../../../../utils/security.util';
 
@@ -66,7 +74,15 @@ export class EditTicketDialog implements OnInit {
    allTags: any = [];
    allTicketFiles: any = [];
 
+   checklists: Checklist[] = [];
+   checklist: Checklist;
+
    filteredPeoplesAndGroups$: Observable<any[]>;
+
+   options: ITreeOptions = {
+      displayField: 'descricao',
+      useCheckbox: true,
+   };
 
    get sortConversation() {
       if (this.data.ticket.conversations != null) {
@@ -76,12 +92,26 @@ export class EditTicketDialog implements OnInit {
       }
    }
 
+   get state() {
+      if (this.checklist.treeStateJson != null)
+         return this.checklist.treeStateJson && JSON.parse(this.checklist.treeStateJson);
+   }
+   set state(state) {
+      this.checklist.treeStateJson = JSON.stringify(state);
+
+      this._dialogRef
+         .afterClosed()
+         .subscribe(() => {
+            this._checklistService.update(this.checklist.id, this.checklist).subscribe(() => { });
+         })
+   }
+
    @ViewChild('peopleInput', { static: false }) peopleInput: ElementRef<HTMLInputElement>;
    @ViewChild('auto', { static: false }) matAutocomplete: MatAutocomplete;
 
    constructor(
       @Inject(MAT_DIALOG_DATA) public data: { ticket: any, column: Column, user: User, boardId: number },
-      private dialogRef: MatDialogRef<EditTicketDialog>,
+      private _dialogRef: MatDialogRef<EditTicketDialog>,
       private matDialog: MatDialog,
       private _datePipe: DatePipe,
       private _spinner: NgxSpinnerService,
@@ -100,6 +130,9 @@ export class EditTicketDialog implements OnInit {
       private columnService: ColumnService,
       private _groupService: GroupService,
       private _peopleGroupService: PeopleGroupService,
+      private _checklistService: ChecklistService,
+      private _checklistEtapasService: ChecklistEtapasService,
+      private _checklistForTicketService: ChecklistForTicketService,
    ) { }
 
    async ngOnInit() {
@@ -203,6 +236,42 @@ export class EditTicketDialog implements OnInit {
          .then((response: any) => {
             peopleGroupRes = (response || []);
          }).catch(error => console.log(error));
+
+      await this._checklistService.getAll()
+         .toPromise()
+         .then((response: any) => {
+            this.checklists = response;
+         }).catch(error => console.log(error));
+
+      let checklistEtapas: CheckListEtapa[] = []
+
+      await this._checklistEtapasService.getAll()
+         .toPromise()
+         .then((response: any) => {
+            checklistEtapas = response;
+         }).catch(error => console.log(error));
+
+      let checklistForTicket;
+
+      await this._checklistForTicketService.findAll()
+         .toPromise()
+         .then((response: any) => {
+            checklistForTicket = response.find(el => el.ticketId == this.data.ticket.id);
+         }).catch(error => console.log(error));
+
+      this.checklists.forEach(checklist => {
+         let newChecklistEtapa: CheckListEtapa;
+
+         checklist.checkListEtapas.forEach(oldChecklistEtapa => {
+            newChecklistEtapa = checklistEtapas.find(l => l.id == oldChecklistEtapa.id);
+
+            oldChecklistEtapa.children = newChecklistEtapa.children;
+         });
+      });
+
+      if (checklistForTicket) {
+         this.checklist = this.checklists.find(el => el.id == checklistForTicket.checklistId);
+      }
 
       this.allPeoples = this.allPeoples.filter(el => el.createdById === this._currentUser.people.createdById);
 
@@ -524,7 +593,6 @@ export class EditTicketDialog implements OnInit {
 
       dialogRef.afterClosed().subscribe(
          (result) => {
-            debugger;
             if (!result) return;
 
             this.wasChanged.next(true);
@@ -552,5 +620,33 @@ export class EditTicketDialog implements OnInit {
       downloadLink.download = fileName;
       downloadLink.click();
       downloadLink.remove();
+   }
+
+   openAddChecklistDialog(event) {
+      event.stopPropagation();
+
+      const ticket = this.data.ticket;
+
+      const dialogRef = this.matDialog.open(AddChecklistDialog, {
+         width: '350px',
+         position: { top: '40px' },
+         data: { ticket },
+         disableClose: false,
+      });
+   }
+
+   collapseArea() {
+      const colPrincipal = document.getElementById('col-principal');
+      const colSecundaria = document.getElementById('col-secundaria');
+
+      if (!colSecundaria.classList.contains('d-none')) {
+         colSecundaria.classList.add('d-none');
+         colPrincipal.classList.replace('col-8', 'col-12');
+
+         return;
+      }
+
+      colSecundaria.classList.remove('d-none');
+      colPrincipal.classList.replace('col-12', 'col-8')
    }
 }

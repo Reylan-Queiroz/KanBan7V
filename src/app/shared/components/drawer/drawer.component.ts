@@ -47,7 +47,12 @@ export class DrawerComponent implements OnInit {
             boards = res;
          }).catch(err => console.log(err));
 
-      boards = boards.filter(el => el.peopleHigherId === Security.getUser().people.createdById);
+      let id = Security.getUser().people.createdById;
+
+      if (Security.getUser().roleId <= 2)
+         id = Security.getUser().peopleId;
+
+      boards = boards.filter(el => el.peopleHigherId === id);
 
       data[0].name = 'Quadros';
       data[0].children = boards;
