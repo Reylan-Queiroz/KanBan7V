@@ -5,8 +5,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
 import { TicketService } from 'src/app/core/services/ticket.service';
 import { Column } from 'src/app/shared/models/column';
+import { Ticket } from 'src/app/shared/models/ticket';
 import { User } from 'src/app/shared/models/user';
-import { Constants } from 'src/app/shared/utils/constants.util';
+import { environment } from 'src/environments/environment';
 
 @Component({
    selector: 'app-add-ticket',
@@ -38,14 +39,14 @@ export class AddTicketDialog {
       const position = this.data.column.tickets.length;
       const newDate = this._datePipe.transform(new Date(), 'yyyy-MM-ddTHH:mm:ss');
 
-      let ticket = { id: 0, title: title, description: '', createdAt: newDate, dueDate: undefined, dateConclusion: undefined, position: position, postedById: this.data.user.peopleId, columnId: columnId };
+      const ticket = new Ticket(0, title, '', newDate, undefined, undefined, undefined, position, this.data.user.peopleId, null, columnId, null, null, null, null, null);
 
-      this._ticketService.create(ticket).subscribe(
+      this._ticketService.save(ticket).subscribe(
          () => {
-            this._toastrService.success('Sucesso!', '', Constants.toastrConfig);
+            this._toastrService.success('Sucesso!', '', environment.toastrConfig);
             this._dialogRef.close('Ticket Criado!');
          }, () => {
-            this._toastrService.error('Falha!', '', Constants.toastrConfig);
+            this._toastrService.error('Falha!', '', environment.toastrConfig);
          }
       );
    }

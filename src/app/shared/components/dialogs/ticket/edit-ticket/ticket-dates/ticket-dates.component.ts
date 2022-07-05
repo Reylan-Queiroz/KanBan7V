@@ -21,7 +21,7 @@ export class TicketDatesComponent implements OnInit {
    ) { }
 
    ngOnInit() {
-      if (!this.currentTicket.dueDate.toString().startsWith('0001')) { this.dueDate = this.currentTicket.dueDate }
+      if (!this.currentTicket.dueDate.toString().startsWith('0001')) this.dueDate = this.currentTicket.dueDate;
    }
 
    addDueDate(event) {
@@ -31,8 +31,8 @@ export class TicketDatesComponent implements OnInit {
       ticket.dueDate = this._datePipe.transform(event.value, 'yyyy-MM-ddTHH:mm:ss');
 
       this._ticketService.update(ticket.id, ticket).subscribe(
-         () => { this.hasChanged.emit(true) },
-         (error) => { console.log(error); }
+         () => this.hasChanged.emit(true),
+         error => console.log(error)
       );
    }
 
@@ -42,8 +42,8 @@ export class TicketDatesComponent implements OnInit {
       ticket.dateFinished = ticket.hasFinished ? this._datePipe.transform(new Date(), 'yyyy-MM-ddTHH:mm:ss') : null;
 
       this._ticketService.update(ticket.id, ticket).subscribe(
-         () => { this.hasChanged.emit(true) },
-         (error) => { console.log(error); }
+         () => this.hasChanged.emit(true),
+         error => console.log(error)
       );
    }
 }

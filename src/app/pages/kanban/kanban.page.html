@@ -3,7 +3,7 @@
       <div class="row" fxLayoutAlign="start center">
          <div class="col-8">
             <h2 fxFlex="80" class="mat-h2">
-               <span contenteditable [textContent]="column?.title" (blur)="editColumnName($event, column)"></span>
+               <span contenteditable="true" [textContent]="column?.title" (blur)="editColumnName($event, column)"></span>
             </h2>
          </div>
          <div class="col-4 text-end">
@@ -51,8 +51,8 @@
       <div class="collapse mt-2" id="collapseCreateColumn">
          <div class="card card-body">
             <form class="input-group" [formGroup]="formColumn">
-               <input type="text" class="form-control form-control-sm" #inputColumn placeholder="Insira o nome da lista" maxlength="18" formControlName="nameColumn" (keydown.enter)="addColumn($event)">
-               <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addColumn($event)" [disabled]="formColumn.invalid"><i class="fas fa-plus"></i></button>
+               <input type="text" class="form-control form-control-sm" #inputColumn placeholder="Insira o nome da lista" maxlength="18" formControlName="nameColumn" (keydown.enter)="addColumn()">
+               <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addColumn()" [disabled]="formColumn.invalid"><i class="fas fa-plus"></i></button>
             </form>
             <small class="text-danger text-break mt-2" *ngIf="formColumn.controls.nameColumn.invalid && !formColumn.controls.nameColumn.pristine">
                <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>Este campo deve conter entre 3 e 18 caracteres.<br>

@@ -6,10 +6,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { LoginService } from 'src/app/core/services/login.service';
 import { fadeInAnimation } from 'src/app/shared/animations/fade-in.animation';
-import { RoleModel } from 'src/app/shared/models/RoleModel';
-import { Constants } from 'src/app/shared/utils/constants.util';
 import { Security } from 'src/app/shared/utils/security.util';
-import { RoleService } from '../../core/services/role.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
    selector: 'app-login',
@@ -62,7 +60,7 @@ export class LoginPage implements OnInit {
             this._spinner.hide();
          },
          (error: HttpErrorResponse) => {
-            this._toastr.error('Usuário ou senha inválidos.', '', Constants.toastrConfig);
+            this._toastr.error('Usuário ou senha inválidos.', '', environment.toastrConfig);
             this._spinner.hide();
             console.log(error);
          }

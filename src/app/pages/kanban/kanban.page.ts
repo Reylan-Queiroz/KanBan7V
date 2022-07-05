@@ -2,7 +2,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatMenu, MatMenuTrigger } from '@angular/material';
+import { MatMenuTrigger } from '@angular/material';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -19,7 +19,7 @@ import { Column } from 'src/app/shared/models/column';
 import { PeopleGroup } from 'src/app/shared/models/peopleGroup';
 import { Ticket } from 'src/app/shared/models/ticket';
 import { Security } from 'src/app/shared/utils/security.util';
-import { Constants } from '../../shared/utils/constants.util';
+import { environment } from 'src/environments/environment';
 
 @Component({
    selector: 'app-board',
@@ -116,7 +116,7 @@ export class KanbanPage implements OnInit {
                   elTicket.tags = [];
 
                   ticketTags.forEach(elTicketTags => {
-                     if (elTicketTags.ticketId !== elTicket.id) { return; }
+                     if (elTicketTags.ticketId !== elTicket.id) return;
 
                      elTicket.ticketTagsId = elTicketTags.id;
                      elTicketTags.tag.checked = true;
@@ -143,7 +143,7 @@ export class KanbanPage implements OnInit {
                   });
 
                   assignedTo.forEach(element => {
-                     if (element.ticketId !== elTicket.id) { return; }
+                     if (element.ticketId !== elTicket.id) return;
 
                      let item: any;
 
@@ -198,7 +198,7 @@ export class KanbanPage implements OnInit {
 
          this._ticketService.update(currentItemDrop.id, currentItemDrop).subscribe();
 
-         let previousItemDrop: Column = event.container.data[event.currentIndex];
+         let previousItemDrop: Ticket = event.container.data[event.currentIndex];
          previousItemDrop.position = event.previousIndex;
 
 
@@ -232,7 +232,7 @@ export class KanbanPage implements OnInit {
 
       if (element.classList.contains('in-exclusion')) {
          this._columnService.delete(columnId).subscribe(() => {
-            this._toastrService.success('Sucesso!', '', Constants.toastrConfig);
+            this._toastrService.success('Sucesso!', '', environment.toastrConfig);
 
             menuTrigger.closeMenu();
 
@@ -266,7 +266,7 @@ export class KanbanPage implements OnInit {
       });
 
       dialog.afterClosed().subscribe((result) => {
-         if (!result) { return; }
+         if (!result) return;
 
          this._wasChanged.next(true);
       });
@@ -297,7 +297,7 @@ export class KanbanPage implements OnInit {
       });
 
       dialog.afterClosed().subscribe(result => {
-         if (!result) { return; }
+         if (!result) return;
 
          this._wasChanged.next(true);
       });
@@ -309,18 +309,17 @@ export class KanbanPage implements OnInit {
       const name = this.formColumn.controls['nameColumn'].value.trim();
       const position = this.columnsAndTickets.length;
 
-      if (name.length < 3) { return; }
+      if (name.length < 3) return;
 
       let column = new Column(0, name, position, this._boardId, null, []);
 
-      this._columnService.create(column).subscribe(
+      this._columnService.save(column).subscribe(
          () => {
-            this._toastrService.success('Coluna criada com sucesso.', 'Êxito', Constants.toastrConfig);
+            this._toastrService.success('Coluna criada com sucesso.', 'Êxito', environment.toastrConfig);
 
             this._wasChanged.next(true);
-         },
-         (error: HttpErrorResponse) => {
-            this._toastrService.error(error.message, `Error ${error.status}`, Constants.toastrConfig);
+         }, (error: HttpErrorResponse) => {
+            this._toastrService.error(error.message, `Error ${error.status}`, environment.toastrConfig);
          });
 
       this.formColumn.controls['nameColumn'].setValue(null);
@@ -331,22 +330,22 @@ export class KanbanPage implements OnInit {
       const newTitle = element.innerText.trim();
 
       if (newTitle.length > 18) {
-         this._toastrService.error('O nome excedeu o limite de caracteres(18).', 'Erro', Constants.toastrConfig);
+         this._toastrService.error('O nome excedeu o limite de caracteres(18).', 'Erro', environment.toastrConfig);
 
          element.innerText = column.title; // return to old value
 
          return;
       }
 
-      if (newTitle === column.title) { return; }
+      if (newTitle === column.title) return;
 
       column.title = newTitle;
 
       this._columnService.update(Number.parseInt(column.id), column).subscribe(
          () => {
-            this._toastrService.success('Nome alterado com sucesso.', 'Êxito', Constants.toastrConfig);
+            this._toastrService.success('Nome alterado com sucesso.', 'Êxito', environment.toastrConfig);
          }, (error: HttpErrorResponse) => {
-            this._toastrService.error(error.message, `Error ${error.status}`, Constants.toastrConfig);
+            this._toastrService.error(error.message, `Error ${error.status}`, environment.toastrConfig);
          }
       );
    }

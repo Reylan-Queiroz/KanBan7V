@@ -7,7 +7,7 @@ export class Conversation {
       public id: number,
       public text: string,
       public oldText: string,
-      public date: Date,
+      public date: Date | string,
       public modified: boolean,
 
       public conversationFileId: number,

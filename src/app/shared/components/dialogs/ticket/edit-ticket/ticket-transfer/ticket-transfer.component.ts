@@ -1,9 +1,9 @@
-import { TicketService } from './../../../../../../core/services/ticket.service';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ColumnService } from './../../../../../../core/services/column.service';
-import { BoardService } from './../../../../../../core/services/board.service';
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Ticket } from 'src/app/shared/models/ticket';
+import { BoardService } from './../../../../../../core/services/board.service';
+import { ColumnService } from './../../../../../../core/services/column.service';
+import { TicketService } from './../../../../../../core/services/ticket.service';
 
 @Component({
    selector: 'app-ticket-transfer',
@@ -47,13 +47,13 @@ export class TicketTransferComponent implements OnInit {
    }
 
    private async _loadData() {
-      await this._boardService.getAll()
+      await this._boardService.findAll()
          .toPromise()
          .then((res: any) => {
             this.boards = res;
          }).catch(err => console.log(err));
 
-      await this._columnService.getAll()
+      await this._columnService.findAll()
          .toPromise()
          .then((res: any) => {
             this._columns = res;
@@ -66,8 +66,9 @@ export class TicketTransferComponent implements OnInit {
       this._ticket.columnId = form.controls['column'].value;
       this._ticket.column = this._columns.find(el => el.id === this._ticket.columnId);
 
-      this._ticketService.update(this._ticket.id, this._ticket)
-         .subscribe((res) => {
+      this._ticketService
+         .update(this._ticket.id, this._ticket)
+         .subscribe(() => {
             this.hasChanged.emit(true);
          }, (error) => { console.log(error); });
    }

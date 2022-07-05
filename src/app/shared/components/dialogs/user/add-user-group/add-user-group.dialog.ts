@@ -1,14 +1,14 @@
-import { Security } from './../../../../utils/security.util';
-import { PeopleGroupService } from './../../../../../core/services/peopleGroup.service';
-import { PeopleService } from 'src/app/core/services/people.service';
-import { Observable } from 'rxjs';
-import { GroupService } from './../../../../../core/services/group.service';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { People } from 'src/app/shared/models/people';
-import { MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent, MatDialogRef } from '@angular/material';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatChipInputEvent, MatDialogRef } from '@angular/material';
+import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { PeopleService } from 'src/app/core/services/people.service';
+import { People } from 'src/app/shared/models/people';
+import { GroupService } from './../../../../../core/services/group.service';
+import { PeopleGroupService } from './../../../../../core/services/peopleGroup.service';
+import { Security } from './../../../../utils/security.util';
 
 @Component({
    selector: 'app-add-user-group',
@@ -59,7 +59,7 @@ export class AddUserGroupDialog implements OnInit {
    }
 
    private async _loadData() {
-      await this._peopleService.getAll()
+      await this._peopleService.findAll()
          .toPromise()
          .then((res: any) => {
             this._peoples = res;
@@ -69,10 +69,10 @@ export class AddUserGroupDialog implements OnInit {
    }
 
    onSubmit(form) {
-      this._groupService.create(form.value).subscribe(
+      this._groupService.save(form.value).subscribe(
          (res: any) => {
             this.selectedPeople.forEach(people => {
-               this._peopleGroupService.create({ id: 0, peopleId: people.id, groupId: res.id, createdById: Security.getUser().peopleId }).subscribe();
+               this._peopleGroupService.save({ id: 0, peopleId: people.id, groupId: res.id, createdById: Security.getUser().peopleId }).subscribe();
                this._dialogRef.close('Success!');
             });
          },

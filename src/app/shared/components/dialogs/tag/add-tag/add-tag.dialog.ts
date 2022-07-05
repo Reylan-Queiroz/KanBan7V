@@ -45,14 +45,14 @@ export class AddTagDialog implements OnInit {
    }
 
    private _loadData() {
-      this._colorService.getAll().subscribe(
-         (response) => { this.colors$ = response; },
+      this._colorService.findAll().subscribe(
+         (response: any) => { this.colors$ = response; },
          (error) => { console.log(error); }
       );
    }
 
    selectColor(event: MatSelectChange) {
-      this._colorService.getById(event.value).subscribe(
+      this._colorService.findOne(event.value).subscribe(
          (response: any) => {
             this.selectedColor = response.code;
          }, (error) => { console.log(error); }
@@ -60,7 +60,7 @@ export class AddTagDialog implements OnInit {
    }
 
    onSubmit(form: FormGroup) {
-      this._tagService.create(new Tag(0, form.value['name'], false, form.value['color'], undefined)).subscribe(
+      this._tagService.save(new Tag(0, form.value['name'], false, form.value['color'], undefined)).subscribe(
          () => {
             this._dialogRef.close(true);
          }, (error) => { console.log(error); }
@@ -75,7 +75,7 @@ export class AddTagDialog implements OnInit {
       dialogRef.afterClosed().subscribe(result => {
          if (!result) { return; }
 
-         this._colorService.create(result).subscribe(
+         this._colorService.save(result).subscribe(
             () => { this._wasChanged.next(true); },
             (error) => { console.log(error); }
          );

@@ -3,9 +3,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CrudOperations } from 'src/app/shared/interfaces/crud-operations';
 
-@Injectable({
-   providedIn: 'root'
-})
 export class BaseService<T, ID> implements CrudOperations<T, ID>  {
    constructor(
       protected _http: HttpClient,

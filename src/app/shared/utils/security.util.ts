@@ -1,27 +1,27 @@
+import { environment } from "src/environments/environment";
 import { Role } from "../enums/role.enum";
 import { User } from "../models/user";
-import { Constants } from "./constants.util";
 
 export class Security {
    public static set(user: User, token: string) {
       const data = JSON.stringify(user);
 
-      localStorage.setItem(Constants.kanbanUser, btoa(data));
-      localStorage.setItem(Constants.kanbanToken, token);
+      localStorage.setItem(environment.kanbanUser, btoa(data));
+      localStorage.setItem(environment.kanbanToken, token);
    }
 
    public static setUser(user: User) {
       const data = JSON.stringify(user);
 
-      localStorage.setItem(Constants.kanbanUser, btoa(data));
+      localStorage.setItem(environment.kanbanUser, btoa(data));
    }
 
    public static setToken(token: string) {
-      localStorage.setItem(Constants.kanbanToken, token);
+      localStorage.setItem(environment.kanbanToken, token);
    }
 
    public static getUser(): User {
-      const data = localStorage.getItem(Constants.kanbanUser);
+      const data = localStorage.getItem(environment.kanbanUser);
 
       if (data)
          return JSON.parse(atob(data));
@@ -30,7 +30,7 @@ export class Security {
    }
 
    public static getToken(): string {
-      const data = localStorage.getItem(Constants.kanbanToken);
+      const data = localStorage.getItem(environment.kanbanToken);
 
       if (data)
          return data;
@@ -55,7 +55,7 @@ export class Security {
    }
 
    public static clear() {
-      localStorage.removeItem(Constants.kanbanUser);
-      localStorage.removeItem(Constants.kanbanToken);
+      localStorage.removeItem(environment.kanbanUser);
+      localStorage.removeItem(environment.kanbanToken);
    }
 }

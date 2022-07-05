@@ -26,8 +26,8 @@ export class CardTicketComponent implements OnInit {
    compressTags() {
       let tagsName = document.getElementsByClassName('tagName');
 
-      for (let index = 0; index < tagsName.length; index++) {
-         let item = tagsName.item(index);
+      for (let i = 0; i < tagsName.length; i++) {
+         let item = tagsName.item(i);
 
          item.classList.item(1) === 'd-none' ? item.classList.remove('d-none') : item.classList.add('d-none');
       }

@@ -1,13 +1,13 @@
-import { Router } from '@angular/router';
-import { Security } from './../../utils/security.util';
-import { BoardService } from './../../../core/services/board.service';
-import { Component, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { Component, OnInit } from '@angular/core';
+import { MatTreeNestedDataSource } from '@angular/material';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { MatTreeNestedDataSource } from '@angular/material';
-import { NestedTreeControl } from '@angular/cdk/tree';
 import { fadeInAnimation } from '../../animations/fade-in.animation';
+import { BoardService } from './../../../core/services/board.service';
+import { Security } from './../../utils/security.util';
 
 @Component({
    selector: 'app-drawer',
@@ -19,6 +19,7 @@ import { fadeInAnimation } from '../../animations/fade-in.animation';
 export class DrawerComponent implements OnInit {
    dataSource = new MatTreeNestedDataSource<any>();
    treeControl = new NestedTreeControl<any>(node => node.children);
+   user = Security.getUser();
 
    isHandset$: Observable<boolean> = this._breakpointObserver
       .observe(Breakpoints.Handset)
@@ -41,7 +42,8 @@ export class DrawerComponent implements OnInit {
       let boards: any[] = [];
       let data = [{ name: '', children: [] }];
 
-      await this._boardService.getAll()
+      await this._boardService
+         .findAll()
          .toPromise()
          .then((res: any) => {
             boards = res;

@@ -5,8 +5,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from 'src/app/core/services/user.service';
 import { User } from 'src/app/shared/models/user';
-import { Constants } from 'src/app/shared/utils/constants.util';
 import { Security } from 'src/app/shared/utils/security.util';
+import { environment } from 'src/environments/environment';
 
 @Component({
    selector: 'app-mudar-senha',
@@ -38,11 +38,11 @@ export class MudarSenhaComponent {
       this._userService
          .update(this.data.user.id, this.data.user)
          .subscribe(() => {
-            this._toastr.success('Sucesso!', '', Constants.toastrConfig);
+            this._toastr.success('Sucesso!', '', environment.toastrConfig);
             Security.setUser(this.data.user);
             this.dialogRef.close();
          }, (error: HttpErrorResponse) => {
-            this._toastr.error(error.message, 'Erros internos.', Constants.toastrConfig);
-         })
+            this._toastr.error(error.message, 'Erros internos.', environment.toastrConfig);
+         });
    }
 }

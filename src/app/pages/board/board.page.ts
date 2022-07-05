@@ -55,7 +55,7 @@ export class BoardPage implements OnInit {
    private async _loadData() {
       this._spinner.show();
 
-      await this._boardService.getAll()
+      await this._boardService.findAll()
          .toPromise()
          .then((res: any) => {
             this.boards = res;
@@ -84,7 +84,7 @@ export class BoardPage implements OnInit {
       });
 
       dialog.afterClosed().subscribe(result => {
-         if (!result) { return; }
+         if (!result) return;
 
          this._wasChanged.next(true);
       });

@@ -56,38 +56,38 @@ export class DashboardPage implements OnInit {
       let peopleGroup: PeopleGroup;
       let peopleGroups: PeopleGroup[] = [];
 
-      await this._peopleService.getAll()
+      await this._peopleService.findAll()
          .toPromise()
          .then((response: any) => {
             peoples = (response || []);
          }).catch(error => console.log(error));
 
       let usersRes;
-      await this._userService.getAll()
+      await this._userService.findAll()
          .toPromise()
          .then((response: any) => {
             usersRes = (response || []);
          }).catch(error => console.log(error));
 
-      await this._roleService.getAll()
+      await this._roleService.findAll()
          .toPromise()
          .then((response: any) => {
             roles = (response || []);;
          }).catch(error => console.log(error));
 
-      await this._groupService.getAll()
+      await this._groupService.findAll()
          .toPromise()
          .then((response: any) => {
             groups = (response || []);;
          }).catch(error => console.log(error));
 
-      await this._peopleGroupService.getAll()
+      await this._peopleGroupService.findAll()
          .toPromise()
          .then((response: any) => {
             peopleGroupRes = (response || []);
          }).catch(error => console.log(error));
 
-      await this._peopleRelationService.getAll()
+      await this._peopleRelationService.findAll()
          .toPromise()
          .then((response: any) => {
             peopleRelations = response;

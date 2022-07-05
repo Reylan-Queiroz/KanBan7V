@@ -36,7 +36,7 @@ export class AddChecklistDialog implements OnInit {
    }
 
    private async _loadData() {
-      await this._checklistService.getAll()
+      await this._checklistService.findAll()
          .toPromise()
          .then((response: any) => {
             this.checklists = response;
@@ -44,7 +44,7 @@ export class AddChecklistDialog implements OnInit {
 
       let checklistEtapas: CheckListEtapa[] = [];
 
-      await this._checklistEtapasService.getAll()
+      await this._checklistEtapasService.findAll()
          .toPromise()
          .then((response: any) => {
             checklistEtapas = response;
@@ -66,11 +66,11 @@ export class AddChecklistDialog implements OnInit {
       const dataInicio = form.value['dataInicio'];
       const ticketId = this._data.ticket.id;
 
-      const checklistForTicket = { DataInicio: dataInicio, TicketId: ticketId, Ticket: null, ChecklistId: checklistId, Checklist: null };
+      const checklistForTicket = { DataInicio: dataInicio, TicketId: ticketId, ChecklistId: checklistId, TreeStateJson: "" };
 
       this._checklistForTicketService.save(checklistForTicket)
          .subscribe(() => {
-
+            this._dialogRef.close(true);
          }, (error) => { console.log(error) })
    }
 }

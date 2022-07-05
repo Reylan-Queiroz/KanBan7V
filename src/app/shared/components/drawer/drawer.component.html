@@ -1,7 +1,7 @@
 <mat-sidenav-container class="sidenav-container" style="height: 100%;">
    <mat-sidenav #drawer class="sidenav" fixedInViewport="true" [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" [mode]="'over'" [opened]="!(isHandset$ | async) === false">
       <mat-toolbar class="h-auto mt-2">
-         <img class="img-fluid" src="./assets/img/LogoEmpresa.png">
+         <img class="img-fluid" src="assets/img/LogoEmpresa.png">
       </mat-toolbar>
 
       <mat-nav-list>
@@ -30,11 +30,11 @@
          </mat-tree>
       </mat-nav-list>
 
-      <li class="link-sidenav" [routerLink]="['/dashboard']">
+      <li class="link-sidenav" [routerLink]="['/dashboard']" [hidden]="user.roleId > 2">
          Dashboard
       </li>
 
-      <li class="link-sidenav" [routerLink]="['/checklist']">
+      <li class="link-sidenav" [routerLink]="['/checklist']" [hidden]="user.roleId > 2">
          Checklist
       </li>
    </mat-sidenav>

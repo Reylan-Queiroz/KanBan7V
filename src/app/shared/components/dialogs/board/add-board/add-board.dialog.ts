@@ -3,9 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
 import { BoardService } from 'src/app/core/services/board.service';
+import { Board } from 'src/app/shared/models/board';
 import { User } from 'src/app/shared/models/user';
-import { Constants } from 'src/app/shared/utils/constants.util';
 import { Security } from 'src/app/shared/utils/security.util';
+import { environment } from 'src/environments/environment';
 
 @Component({
    selector: 'app-add-board',
@@ -30,10 +31,11 @@ export class AddBoardDialog {
 
    onSubmit(form: FormGroup) {
       const name = form.value['name'].trim();
+      const board = new Board(0, name, Security.getUser().people.createdById, []);
 
-      this._boardService.create({ boardId: 0, name: name, peopleHigherId: Security.getUser().people.createdById }).subscribe(
+      this._boardService.save(board).subscribe(
          () => {
-            this._toastrService.success('Sucesso!', '', Constants.toastrConfig);
+            this._toastrService.success('Sucesso!', '', environment.toastrConfig);
             this._dialogRef.close('Added');
          }, error => console.log(error)
       );

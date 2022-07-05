@@ -2,11 +2,10 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatAutocomplete, MatCheckboxChange, MatExpansionPanel } from '@angular/material';
+import { MatAutocomplete, MatCheckboxChange } from '@angular/material';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ITreeOptions } from 'angular-tree-component';
-import { ITreeModel } from 'angular-tree-component/dist/defs/api';
+import { ITreeOptions, TreeNode } from 'angular-tree-component';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
@@ -14,6 +13,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { map, startWith } from 'rxjs/operators';
 import { AssignedToService } from 'src/app/core/services/assignedTo.service';
 import { ChecklistService } from 'src/app/core/services/checklist.service';
+import { ChecklistEtapaPrazoService } from 'src/app/core/services/checklistEtapaPrazo.service';
 import { ChecklistEtapasService } from 'src/app/core/services/checklistEtapas.service';
 import { ChecklistForTicketService } from 'src/app/core/services/checklistForTicket.service';
 import { ColorService } from 'src/app/core/services/color.service';
@@ -30,6 +30,7 @@ import { TicketFileService } from 'src/app/core/services/ticketFile.service';
 import { TicketTagsService } from 'src/app/core/services/ticketTags.service';
 import { AssignedTo } from 'src/app/shared/models/assignedTo';
 import { Checklist } from 'src/app/shared/models/checklist';
+import { ChecklistEtapaPrazo } from 'src/app/shared/models/checklist-etapa-prazo';
 import { CheckListEtapa } from 'src/app/shared/models/checkListEtapa';
 import { Column } from 'src/app/shared/models/column';
 import { Conversation } from 'src/app/shared/models/conversation';
@@ -38,6 +39,7 @@ import { People } from 'src/app/shared/models/people';
 import { PeopleGroup } from 'src/app/shared/models/peopleGroup';
 import { Tag } from 'src/app/shared/models/tag';
 import { Ticket } from 'src/app/shared/models/ticket';
+import { TreeState } from 'src/app/shared/models/treeState';
 import { User } from 'src/app/shared/models/user';
 import { AddChecklistDialog } from '../../checklist/add-checklist/add-checklist.dialog';
 import { AddTagDialog } from '../../tag/add-tag/add-tag.dialog';
@@ -52,11 +54,16 @@ export class EditTicketDialog implements OnInit {
    private wasChanged = new BehaviorSubject<boolean>(false);
    private _currentUser: any = Security.getUser();
 
+   checklistForTicket: any;
+   checklistEtapasPrazo: ChecklistEtapaPrazo[] = [];
+
+   panelOpenState;
+
    changed = false;
 
    searchText = '';
 
-   matChipConfiguration = { visible: true, selectable: true, removable: true, addOnBlur: false }
+   matChipConfiguration = { visible: true, selectable: true, removable: true, addOnBlur: false };
 
    description: string = this.data.ticket.description;
 
@@ -65,6 +72,8 @@ export class EditTicketDialog implements OnInit {
    separatorKeysCodes: number[] = [ENTER, COMMA];
 
    peoplesAndGroups: any[] = [];
+
+   stateOld;
 
    private allPeoples: any[] = [];
    private allFiles: FileModel[] = [];
@@ -93,17 +102,11 @@ export class EditTicketDialog implements OnInit {
    }
 
    get state() {
-      if (this.checklist.treeStateJson != null)
-         return this.checklist.treeStateJson && JSON.parse(this.checklist.treeStateJson);
+      if (this.checklistForTicket.treeStateJson != null)
+         return this.checklistForTicket.treeStateJson && JSON.parse(this.checklistForTicket.treeStateJson);
    }
    set state(state) {
-      this.checklist.treeStateJson = JSON.stringify(state);
-
-      this._dialogRef
-         .afterClosed()
-         .subscribe(() => {
-            this._checklistService.update(this.checklist.id, this.checklist).subscribe(() => { });
-         })
+      this.checklistForTicket.treeStateJson = JSON.stringify(state);
    }
 
    @ViewChild('peopleInput', { static: false }) peopleInput: ElementRef<HTMLInputElement>;
@@ -133,6 +136,7 @@ export class EditTicketDialog implements OnInit {
       private _checklistService: ChecklistService,
       private _checklistEtapasService: ChecklistEtapasService,
       private _checklistForTicketService: ChecklistForTicketService,
+      private _checklistEtapaPrazoService: ChecklistEtapaPrazoService
    ) { }
 
    async ngOnInit() {
@@ -158,6 +162,8 @@ export class EditTicketDialog implements OnInit {
       let conversationFiles = [];
       let groups: any[] = [];
 
+      let checklistEtapas: CheckListEtapa[] = [];
+
       let peopleGroupRes;
       let peopleGroup: PeopleGroup;
 
@@ -165,102 +171,112 @@ export class EditTicketDialog implements OnInit {
       this.data.ticket.conversations = [];
       this.data.ticket.files = [];
 
-      await this.columnService.getAll()
+      await this.columnService.findAll()
          .toPromise()
          .then((response: any) => {
             this.columns = (response || []).filter(el => el.boardId === this.data.boardId);
          }).catch(error => console.log(error));
 
-      await this.ticketTagsService.getAll()
+      await this.ticketTagsService.findAll()
          .toPromise()
          .then((response: any) => {
             ticketTags = response;
          }).catch(error => console.log(error));
 
-      await this.tagService.getAll()
+      await this.tagService.findAll()
          .toPromise()
          .then((response: any) => {
             this.allTags = response;
          }).catch(error => console.log(error));
 
-      await this.colorService.getAll()
+      await this.colorService.findAll()
          .toPromise()
          .then((response: any) => {
             colors = response;
          }).catch(error => console.log(error));
 
-      await this.peopleService.getAll()
+      await this.peopleService.findAll()
          .toPromise()
          .then((response: any) => {
             this.allPeoples = response;
          }).catch(error => console.log(error));
 
-      await this.assignedToService.getAll()
+      await this.assignedToService.findAll()
          .toPromise()
          .then((response: any) => {
             assignedTo = response;
          }).catch(error => console.log(error));
 
-      await this.conversationService.getAll()
+      await this.conversationService.findAll()
          .toPromise()
          .then((response: any) => {
             conversations = response;
          }).catch(error => console.log(error));
 
-      await this.fileService.getAll()
+      await this.fileService.findAll()
          .toPromise()
          .then((response: any) => {
             this.allFiles = response;
          }).catch(error => console.log(error));
 
-      await this.ticketFileService.getAll()
+      await this.ticketFileService.findAll()
          .toPromise()
          .then((response: any) => {
             this.allTicketFiles = response;
          }).catch(error => console.log(error));
 
-      await this.conversationFileService.getAll()
+      await this.conversationFileService.findAll()
          .toPromise()
          .then((response: any) => {
             conversationFiles = response;
          }).catch(error => console.log(error));
 
-      await this._groupService.getAll()
+      await this._groupService.findAll()
          .toPromise()
          .then((response: any) => {
             groups = (response || []);;
          }).catch(error => console.log(error));
 
-      await this._peopleGroupService.getAll()
+      await this._peopleGroupService.findAll()
          .toPromise()
          .then((response: any) => {
             peopleGroupRes = (response || []);
          }).catch(error => console.log(error));
 
-      await this._checklistService.getAll()
+      await this._checklistService.findAll()
          .toPromise()
          .then((response: any) => {
             this.checklists = response;
          }).catch(error => console.log(error));
 
-      let checklistEtapas: CheckListEtapa[] = []
-
-      await this._checklistEtapasService.getAll()
+      await this._checklistEtapasService.findAll()
          .toPromise()
          .then((response: any) => {
             checklistEtapas = response;
          }).catch(error => console.log(error));
 
-      let checklistForTicket;
-
       await this._checklistForTicketService.findAll()
          .toPromise()
          .then((response: any) => {
-            checklistForTicket = response.find(el => el.ticketId == this.data.ticket.id);
+            this.checklistForTicket = response.find(el => el.ticketId == this.data.ticket.id);
          }).catch(error => console.log(error));
 
+      await this._checklistEtapaPrazoService.findAll()
+         .toPromise()
+         .then((response: any) => {
+            this.checklistEtapasPrazo = response;
+         }).catch(error => console.log(error));
+
+      checklistEtapas.forEach(checklistEtapa => {
+         const checklistEtapaPrazo: ChecklistEtapaPrazo = this.checklistEtapasPrazo.find((l: ChecklistEtapaPrazo) => l.checklistEtapaId == checklistEtapa.id);
+
+         if (checklistEtapaPrazo) {
+            checklistEtapa.prazo = checklistEtapaPrazo.prazo;
+         }
+      });
+
       this.checklists.forEach(checklist => {
-         let newChecklistEtapa: CheckListEtapa;
+         let newChecklistEtapa: any;
 
          checklist.checkListEtapas.forEach(oldChecklistEtapa => {
             newChecklistEtapa = checklistEtapas.find(l => l.id == oldChecklistEtapa.id);
@@ -269,8 +285,8 @@ export class EditTicketDialog implements OnInit {
          });
       });
 
-      if (checklistForTicket) {
-         this.checklist = this.checklists.find(el => el.id == checklistForTicket.checklistId);
+      if (this.checklistForTicket) {
+         this.checklist = this.checklists.find(el => el.id == this.checklistForTicket.checklistId);
       }
 
       this.allPeoples = this.allPeoples.filter(el => el.createdById === this._currentUser.people.createdById);
@@ -302,7 +318,7 @@ export class EditTicketDialog implements OnInit {
       });
 
       assignedTo.forEach(element => {
-         if (element.ticketId !== this.data.ticket.id) { return; }
+         if (element.ticketId !== this.data.ticket.id) return;
          let item;
 
          if (element.peopleId !== null) {
@@ -321,7 +337,7 @@ export class EditTicketDialog implements OnInit {
          element.file = this.allFiles.find(el => el.id === element.fileId);
 
          if (element.ticketId === this.data.ticket.id) {
-            this.data.ticket.files.push(element)
+            this.data.ticket.files.push(element);
          }
       });
 
@@ -330,7 +346,7 @@ export class EditTicketDialog implements OnInit {
       });
 
       conversations.forEach((conversation: Conversation) => {
-         if (conversation.ticketId !== this.data.ticket.id) { return; }
+         if (conversation.ticketId !== this.data.ticket.id) return;
 
          conversationFiles.forEach(element => {
             if (element.conversationId === conversation.id) {
@@ -366,6 +382,11 @@ export class EditTicketDialog implements OnInit {
       const index = this.columns.indexOf(column);
       this.columns.splice(index, 1);
 
+      if (this.checklistForTicket == undefined)
+         this.stateOld = '';
+      else
+         this.stateOld = this.checklistForTicket.treeStateJson;
+
       this._spinner.hide();
    }
 
@@ -398,7 +419,7 @@ export class EditTicketDialog implements OnInit {
 
       let assignedTo: AssignedTo = new AssignedTo(0, peopleId, groupId, this.data.ticket.id)
 
-      this.assignedToService.create(assignedTo).subscribe(
+      this.assignedToService.save(assignedTo).subscribe(
          () => {
             this.wasChanged.next(true);
          },
@@ -445,11 +466,11 @@ export class EditTicketDialog implements OnInit {
       const text: string = input.value;
 
       if ((text || '').trim()) {
-         const conversation = { id: id, text: text, oldText: '', date: this._datePipe.transform(new Date(), 'yyyy-MM-ddTHH:mm:ss'), modified: false, postedById: this.data.user.peopleId, postedBy: undefined, ticketId: this.data.ticket.id, ticket: undefined };
+         const conversation = new Conversation(id, text, '', this._datePipe.transform(new Date(), 'yyyy-MM-ddTHH:mm:ss'), false, null, null, this.data.user.peopleId, null, this.data.ticket.id, null);
 
          input.value = '';
 
-         this.conversationService.create(conversation).subscribe(
+         this.conversationService.save(conversation).subscribe(
             () => { this.wasChanged.next(true); },
             (error) => { console.log(error); }
          );
@@ -460,16 +481,15 @@ export class EditTicketDialog implements OnInit {
       this.getBase64(file).subscribe(res => {
          const obj = { FileAsBase64: res, FileName: file.name };
 
-         this.fileService.create(obj).subscribe(
+         this.fileService.save(obj).subscribe(
             (result: any) => {
                const obj = { Id: 0, ConversationId: conversation.id, FileId: result.id };
 
-               this.conversationFileService.create(obj).subscribe(
+               this.conversationFileService.save(obj).subscribe(
                   () => { this.wasChanged.next(true); },
                   (error) => { console.log(error); }
                );
-            },
-            (error) => { console.log(error); }
+            }, (error) => { console.log(error); }
          );
       });
    }
@@ -489,7 +509,7 @@ export class EditTicketDialog implements OnInit {
       } else {
          const obj = { id: 0, tagId: tag.id, ticketId: this.data.ticket.id };
 
-         this.ticketTagsService.create(obj).subscribe(
+         this.ticketTagsService.save(obj).subscribe(
             () => { this.changed = true; },
             (error) => { console.log(error); }
          );
@@ -498,13 +518,13 @@ export class EditTicketDialog implements OnInit {
 
    addFileToTicket(file: File, ticket: Ticket) {
       this.getBase64(file).subscribe(res => {
-         const obj = { FileAsBase64: res, FileName: file.name };
+         const obj = { Id: 0, FileAsBase64: res, FileName: file.name };
 
-         this.fileService.create(obj).subscribe(
+         this.fileService.save(obj).subscribe(
             (result: any) => {
-               const obj = { TicketId: ticket.id, FileId: result.id };
+               const obj = { Id: 0, TicketId: ticket.id, FileId: result.id };
 
-               this.ticketFileService.create(obj).subscribe(
+               this.ticketFileService.save(obj).subscribe(
                   () => { this.wasChanged.next(true); },
                   (error) => { console.log(error); }
                );
@@ -575,7 +595,7 @@ export class EditTicketDialog implements OnInit {
 
       this.conversationService.update(conversation.id, conversation).subscribe(
          () => { },
-         (error) => { console.log(error); }
+         error => console.log(error)
       );
    }
 
@@ -633,6 +653,14 @@ export class EditTicketDialog implements OnInit {
          data: { ticket },
          disableClose: false,
       });
+
+      dialogRef.afterClosed().subscribe(
+         (result) => {
+            if (!result) return;
+
+            this.wasChanged.next(true);
+         }, (error) => { console.log(error); }
+      );
    }
 
    collapseArea() {
@@ -640,13 +668,61 @@ export class EditTicketDialog implements OnInit {
       const colSecundaria = document.getElementById('col-secundaria');
 
       if (!colSecundaria.classList.contains('d-none')) {
-         colSecundaria.classList.add('d-none');
          colPrincipal.classList.replace('col-8', 'col-12');
+         colSecundaria.classList.add('d-none');
 
          return;
       }
 
+      colPrincipal.classList.replace('col-12', 'col-8');
       colSecundaria.classList.remove('d-none');
-      colPrincipal.classList.replace('col-12', 'col-8')
+   }
+
+   public itensParaCriar: ChecklistEtapaPrazo[] = [];
+
+   mudarPrazoChecklistEtapa(model: CheckListEtapa, dateValue) {
+      const checklistEtapaPrazo = new ChecklistEtapaPrazo(0, dateValue, model.id, null, this.data.ticket.id, null);
+
+      this.itensParaCriar.push(checklistEtapaPrazo);
+   }
+
+   confirmarAlteracoesChecklist() {
+      this._checklistForTicketService.update(this.checklistForTicket.id, this.checklistForTicket).subscribe();
+
+      if (!this.itensParaCriar) return;
+
+      this.itensParaCriar.forEach(model => {
+         model.prazo = this._datePipe.transform(model.prazo, 'yyyy-MM-ddTHH:mm:ss');
+
+         this._checklistEtapaPrazoService.save(model).subscribe();
+      });
+
+      this.wasChanged.next(true);
+   }
+
+   itemIsChecked(node: TreeNode) {
+      if (!this.stateOld) return;
+
+      const treeState: TreeState = JSON.parse(this.stateOld);
+      const checklistEtapa: CheckListEtapa = node.data;
+      const itensChecados = Object.entries(treeState.activeNodeIds).filter(l => l[1] === true);
+
+      return itensChecados.find(e => e[0] === checklistEtapa.id.toString());
+   }
+
+   carregarDataPrazo(model: CheckListEtapa) {
+      if (model.prazo) return;
+
+      const checklistEtapaPrazo = this.checklistEtapasPrazo.find(el => el.checklistEtapaId == model.id && el.ticketId == this.data.ticket.id);
+
+      if (!checklistEtapaPrazo) return;
+
+      model.prazo = checklistEtapaPrazo.prazo;
+   }
+
+   contemDataPrazo(model: CheckListEtapa) {
+      const checklistEtapaPrazo = this.checklistEtapasPrazo.find(el => el.checklistEtapaId == model.id && el.ticketId == this.data.ticket.id);
+
+      return checklistEtapaPrazo != undefined;
    }
 }

@@ -59,7 +59,8 @@
                <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
                   <mat-expansion-panel-header>
                      <mat-panel-title>
-                        Checklist <!-- <span class="badge badge-dark text-dark">{{data.ticket.files.length}}</span> -->
+                        Checklist
+                        <!-- <span class="badge badge-dark text-dark">{{data.ticket.files.length}}</span> -->
                      </mat-panel-title>
                      <span style="margin-right: 50px;">
                         <button mat-icon-button (click)="openAddChecklistDialog($event)" [disabled]="checklist">
@@ -70,8 +71,41 @@
 
                   <div class="checklist">
                      <tree-root *ngIf="checklist?.checkListEtapas" #tree [(state)]="state" [options]="options" [nodes]="checklist?.checkListEtapas">
+                        <ng-template #treeNodeFullTemplate let-node let-index="index" let-templates="templates">
+                           <div class="tree-node">
+                              <input type="checkbox" [checked]="node.isActive" (change)="node.toggleActivated(true)" [disabled]="itemIsChecked(node)"/>
 
+                              <tree-node-expander [node]="node" style="margin-left: 10px;"></tree-node-expander>
+                              <div class="node-content-wrapper my-2" [class.node-content-wrapper-focused]="node.isFocused">
+                                 <span [class]="node.data.className" [class.title]="true">{{ node.data.descricao }}</span>
+                              </div>
+
+                              <span *ngIf="itemIsChecked(node)" style="margin-left: 20px;">{{node.data?.prazo | date: "dd/MM/yyyy HH:mm:ss"}}</span>
+
+                              <mat-form-field [hidden]="itemIsChecked(node)" style="margin-left: 20px; width: 170px;">
+                                 <input
+                                    matInput
+                                    #picker
+                                    [ngxMatDatetimePicker]="picker"
+                                    placeholder="Prazo"
+                                    [value]="carregarDataPrazo(node.data)"
+                                    [(ngModel)]="node.data.prazo"
+                                    (dateChange)="mudarPrazoChecklistEtapa(node.data, picker._selected)">
+
+                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                 <ngx-mat-datetime-picker #picker>
+                                    <ng-template>
+                                       <span>OK</span>
+                                    </ng-template>
+                                 </ngx-mat-datetime-picker>
+                              </mat-form-field>
+
+                              <tree-node-children [node]="node" [templates]="templates"></tree-node-children>
+                           </div>
+                        </ng-template>
                      </tree-root>
+
+                     <button type="button" class="btn btn-sm btn-success" (click)="confirmarAlteracoesChecklist()">Confirmar</button>
                   </div>
                </mat-expansion-panel>
             </mat-accordion>

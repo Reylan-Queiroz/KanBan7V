@@ -1,11 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ToastrService } from 'ngx-toastr';
 import { TicketService } from 'src/app/core/services/ticket.service';
 import { Column } from 'src/app/shared/models/column';
 import { Ticket } from 'src/app/shared/models/ticket';
-import { Constants } from './../../../../utils/constants.util';
+import { environment } from 'src/environments/environment';
 
 @Component({
    selector: 'app-delete-ticket',
@@ -26,8 +26,8 @@ export class DeleteTicketDialog {
    delete() {
       this._ticketService.delete(this.data.ticket.id).subscribe(
          () => {
-            this._toastrService.success('Sucesso!', '', Constants.toastrConfig);
-            this._dialogRef.close();
+            this._toastrService.success('Sucesso!', '', environment.toastrConfig);
+            this._dialogRef.close(true);
          }, (error: HttpErrorResponse) => { console.log(error) }
       );
    }

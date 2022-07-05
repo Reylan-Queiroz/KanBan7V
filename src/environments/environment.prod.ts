@@ -1,6 +1,11 @@
 export const environment = {
    production: true,
+
    api: {
-      baseUrl: 'http://localhost:5151/api/v1'
-   }
+      baseUrl: 'http://201.39.92.59/kanbanapi/api/v1'
+   },
+
+   toastrConfig: { closeButton: true, progressBar: true, timeOut: 2000 },
+   kanbanUser: 'kanbanuser',
+   kanbanToken: 'kanbantoken',
 };

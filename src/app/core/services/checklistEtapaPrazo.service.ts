@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FileModel } from 'src/app/shared/models/fileModel';
+import { ChecklistEtapaPrazo } from 'src/app/shared/models/checklist-etapa-prazo';
 import { environment } from 'src/environments/environment';
 import { BaseService } from './base.service';
 
 @Injectable({
    providedIn: 'root'
 })
-export class FileService extends BaseService<any, number> {
+export class ChecklistEtapaPrazoService extends BaseService<ChecklistEtapaPrazo, number> {
    constructor(protected _http: HttpClient) {
-      super(_http, `${environment.api.baseUrl}/FileManager`);
+      super(_http, `${environment.api.baseUrl}/ChecklistEtapaPrazo`);
    }
 }

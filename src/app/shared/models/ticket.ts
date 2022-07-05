@@ -9,7 +9,7 @@ export class Ticket {
       public id: number,
       public title: string,
       public description: string,
-      public createdAt: Date,
+      public createdAt: Date | string,
       public dueDate: Date,
       public dateFinished: Date,
       public hasFinished: boolean,

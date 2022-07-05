@@ -46,7 +46,7 @@ export class AddUserDialog implements OnInit {
    }
 
    private async loadData() {
-      await this._roleService.getAll()
+      await this._roleService.findAll()
          .toPromise()
          .then((res: any) => {
             this.roles = res;
@@ -60,13 +60,13 @@ export class AddUserDialog implements OnInit {
    }
 
    onSubmit(form: FormGroup) {
-      this._peopleService.create({ id: 0, name: form.value['name'], createdById: Security.getUser().peopleId }).subscribe(
+      this._peopleService.save({ id: 0, name: form.value['name'], createdById: Security.getUser().peopleId }).subscribe(
          (response: People) => {
             if (!response) return;
 
             let user = { id: 0, login: form.value['login'], password: '1', roleId: form.value['role'], peopleId: response.id };
 
-            this._userService.create(user).subscribe(
+            this._userService.save(user).subscribe(
                () => {
                   this._dialogRef.close('Success!');
                }, (error) => {

@@ -5,12 +5,11 @@ import { HttpClientModule } from '@angular/common/http';
 import localePt from '@angular/common/locales/pt';
 import { LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteModule, MatBadgeModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatChipsModule, MatDatepickerModule, MatDialogModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatOptionModule, MatProgressSpinnerModule, MatSelectModule, MatSidenavModule, MatTableModule, MatToolbarModule, MatTooltipModule, MatTreeModule, MAT_DATE_LOCALE } from '@angular/material';
+import { MAT_DATE_LOCALE } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TreeModule } from 'angular-tree-component';
 import { ColorChromeModule } from 'ngx-color/chrome';
-import { NestableModule } from 'ngx-nestable';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ToastrModule } from 'ngx-toastr';
 import { AppRoutingModule } from './app-routing.module';
@@ -19,7 +18,6 @@ import { ChecklistPage } from './pages/admin-area/checklist/checklist.page';
 import { DashboardPage } from './pages/admin-area/dashboard/dashboard.page';
 import { UserGroupDashboardComponent } from './pages/admin-area/dashboard/user-group-dashboard/user-group-dashboard.component';
 import { UsersDashboardComponent } from './pages/admin-area/dashboard/users-dashboard/users-dashboard.component';
-import { MudarSenhaComponent } from './shared/components/dialogs/user/mudar-senha/mudar-senha.component';
 import { BoardPage } from './pages/board/board.page';
 import { KanbanPage } from './pages/kanban/kanban.page';
 import { LoginPage } from './pages/login/login.page';
@@ -35,9 +33,11 @@ import { TicketDatesComponent } from './shared/components/dialogs/ticket/edit-ti
 import { TicketTransferComponent } from './shared/components/dialogs/ticket/edit-ticket/ticket-transfer/ticket-transfer.component';
 import { AddUserGroupDialog } from './shared/components/dialogs/user/add-user-group/add-user-group.dialog';
 import { AddUserDialog } from './shared/components/dialogs/user/add-user/add-user.dialog';
+import { MudarSenhaComponent } from './shared/components/dialogs/user/mudar-senha/mudar-senha.component';
 import { DrawerComponent } from './shared/components/drawer/drawer.component';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
-import { DisableDirective } from './shared/directives/disable.directive';
+import { DndDirective } from './shared/directives/dnd.directive';
+import { MaterialModule } from './shared/material.module';
 import { FilterPipe } from './shared/pipes/filter.pipe';
 
 registerLocaleData(localePt, 'pt');
@@ -78,7 +78,7 @@ registerLocaleData(localePt, 'pt');
       FilterPipe,
 
       //Directives
-      DisableDirective,
+      DndDirective
    ],
    imports: [
       BrowserModule,
@@ -90,33 +90,9 @@ registerLocaleData(localePt, 'pt');
       ToastrModule.forRoot(),
       DragDropModule,
       ColorChromeModule,
-      NestableModule,
       TreeModule.forRoot(),
 
-      MatFormFieldModule,
-      MatDialogModule,
-      MatChipsModule,
-      MatAutocompleteModule,
-      MatInputModule,
-      MatIconModule,
-      MatCheckboxModule,
-      MatMenuModule,
-      MatCardModule,
-      MatToolbarModule,
-      MatSidenavModule,
-      MatListModule,
-      MatButtonModule,
-      MatOptionModule,
-      MatSelectModule,
-      MatTooltipModule,
-      MatOptionModule,
-      MatDatepickerModule,
-      MatNativeDateModule,
-      MatExpansionModule,
-      MatTreeModule,
-      MatBadgeModule,
-      MatProgressSpinnerModule,
-      MatTableModule,
+      MaterialModule,
 
       NgxMatDatetimePickerModule,
       NgxMatTimepickerModule,
@@ -138,8 +114,11 @@ registerLocaleData(localePt, 'pt');
    providers: [
       DatePipe,
 
-      { provide: LOCALE_ID, useValue: 'pt' },
+      { provide: LOCALE_ID, useValue: 'pt-BR' },
       { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
+   ],
+   exports: [
+      DndDirective
    ],
    bootstrap: [AppComponent]
 })
