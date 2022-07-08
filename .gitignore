@@ -44,3 +44,6 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+/.vs/Site/v17
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
