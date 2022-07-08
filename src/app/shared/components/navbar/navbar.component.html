@@ -4,7 +4,12 @@
          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span>7Rello</span>
+
+      <span style="margin-left: 40%;">{{currentBoard?.name}}</span>
+
       <span class="spacer"></span>
+
+      <small style="margin-right: 15px;">Olá, {{loggedUser.people.name}}</small>
 
       <button mat-icon-button [matMenuTriggerFor]="menu">
          <mat-icon>person</mat-icon>

@@ -8,4 +8,5 @@ export const environment = {
    toastrConfig: { closeButton: true, progressBar: true, timeOut: 2000 },
    kanbanUser: 'kanbanuser',
    kanbanToken: 'kanbantoken',
+   currentBoard: 'currentboard'
 };

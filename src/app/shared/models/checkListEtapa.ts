@@ -6,6 +6,6 @@ export class CheckListEtapa {
       public prazo: Date | null,
 
       public posicao: number,
-      public dataConclusao?: Date,
+      public dataConclusao?: Date
    ) { }
 }

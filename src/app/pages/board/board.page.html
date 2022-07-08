@@ -9,7 +9,7 @@
          </button>
       </div>
       <div class="col-3 mt-2" *ngFor="let board of boards">
-         <mat-card class="shadow board-item" (click)="navigate(board.id)">
+         <mat-card class="shadow board-item" (click)="navigate(board)">
             <mat-card-header>
                <mat-card-title>{{board.name}}</mat-card-title>
             </mat-card-header>

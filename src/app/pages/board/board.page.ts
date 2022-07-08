@@ -8,7 +8,9 @@ import { fadeInAnimation } from 'src/app/shared/animations/fade-in.animation';
 import { AddBoardDialog } from 'src/app/shared/components/dialogs/board/add-board/add-board.dialog';
 import { Role } from 'src/app/shared/enums/role.enum';
 import { Board } from 'src/app/shared/models/board';
+import { Kanban } from 'src/app/shared/utils/kanban.util';
 import { Security } from 'src/app/shared/utils/security.util';
+import { environment } from 'src/environments/environment';
 import { MudarSenhaComponent } from '../../shared/components/dialogs/user/mudar-senha/mudar-senha.component';
 
 @Component({
@@ -33,6 +35,8 @@ export class BoardPage implements OnInit {
 
    async ngOnInit() {
       const user = Security.getUser();
+
+      Kanban.setCurrentBoard(null);
 
       if (user == null)
          return;
@@ -74,7 +78,7 @@ export class BoardPage implements OnInit {
       this._spinner.hide();
    }
 
-   navigate = (id) => this._router.navigate([`kanban/${btoa(id)}`]);
+   navigate = (board: Board) => { this._router.navigate([`kanban/${btoa(board.id.toString())}`]); Kanban.setCurrentBoard(board); };
 
    openDialogAddBoard() {
       let dialog = this._matDialog.open(AddBoardDialog, {

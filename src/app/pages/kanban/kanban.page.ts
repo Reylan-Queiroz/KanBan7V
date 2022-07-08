@@ -15,9 +15,11 @@ import { fadeInAnimation } from 'src/app/shared/animations/fade-in.animation';
 import { AddTicketDialog } from 'src/app/shared/components/dialogs/ticket/add-ticket/add-ticket.dialog';
 import { DeleteTicketDialog } from 'src/app/shared/components/dialogs/ticket/delete-ticket/delete-ticket.dialog';
 import { EditTicketDialog } from 'src/app/shared/components/dialogs/ticket/edit-ticket/edit-ticket.dialog';
+import { Board } from 'src/app/shared/models/board';
 import { Column } from 'src/app/shared/models/column';
 import { PeopleGroup } from 'src/app/shared/models/peopleGroup';
 import { Ticket } from 'src/app/shared/models/ticket';
+import { Kanban } from 'src/app/shared/utils/kanban.util';
 import { Security } from 'src/app/shared/utils/security.util';
 import { environment } from 'src/environments/environment';
 

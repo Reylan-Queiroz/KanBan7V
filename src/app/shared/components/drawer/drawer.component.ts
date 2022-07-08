@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { fadeInAnimation } from '../../animations/fade-in.animation';
+import { Board } from '../../models/board';
+import { Kanban } from '../../utils/kanban.util';
 import { BoardService } from './../../../core/services/board.service';
 import { Security } from './../../utils/security.util';
 
@@ -63,5 +65,5 @@ export class DrawerComponent implements OnInit {
    }
 
    hasChild = (_: number, node: any) => !!node.children && node.children.length > 0;
-   navigate = (boardId: any) => this._router.navigate([`/kanban/${btoa(boardId)}`]);
+   navigate = (board: Board) => { this._router.navigate([`/kanban/${btoa(board.id.toString())}`]); Kanban.setCurrentBoard(board); };
 }

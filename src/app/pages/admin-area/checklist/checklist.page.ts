@@ -7,7 +7,6 @@ import { ChecklistEtapasService } from 'src/app/core/services/checklistEtapas.se
 import { Checklist } from 'src/app/shared/models/checklist';
 import { CheckListEtapa } from 'src/app/shared/models/checkListEtapa';
 import { environment } from 'src/environments/environment';
-import { v4 } from 'uuid';
 
 @Component({
    selector: 'app-checklist',
@@ -22,18 +21,20 @@ export class ChecklistPage {
    checkListNameCtrl = new FormControl();
 
    options: ITreeOptions = {
-      allowDrag: (node) => node.isLeaf,
-      getNodeClone: (node) => ({
-         ...node.data,
-         id: v4(),
-         name: `copy of ${node.data.name}`
-      }),
-
+      allowDrag: true,
       displayField: 'descricao',
    };
 
-   itensNaoCategorizados: CheckListEtapa[] = [];
+   options2: ITreeOptions = {
+      displayField: 'descricao',
+      allowDrag: (node) => node.isLeaf,
+      allowDrop: (element, { parent, index }) => {
+         return parent.hasChildren;
+      }
+   };
+
    itensCategorizados: CheckListEtapa[] = [];
+   itensNaoCategorizados: CheckListEtapa[] = [];
 
    constructor(
       private _fb: FormBuilder,
@@ -45,23 +46,16 @@ export class ChecklistPage {
       this.form = this._fb.group({
          nomeTarefa: ['', Validators.compose([
             Validators.minLength(3),
-            Validators.maxLength(25),
             Validators.required,
          ])]
       });
    }
 
-   onMove(event) {
-      let posicao = event.to.index;
-
-      let checkListEtapaPai: CheckListEtapa = event.to.parent;
-      let checkListEtapaFilho: CheckListEtapa = event.node;
-
-      checkListEtapaFilho.posicao = posicao;
-   }
-
    addTarefa(form: FormGroup) {
-      let itemNaoCategorizado = new CheckListEtapa(0, form.value['nomeTarefa'], [], null, 0, null);
+      const nomeTarefa = form.value['nomeTarefa'][0].toUpperCase() + form.value['nomeTarefa'].substr(1);
+      const id = this.itensCategorizados.length + this.itensNaoCategorizados.length + 1;
+
+      let itemNaoCategorizado = new CheckListEtapa(id, nomeTarefa, [], null, 0, null);
 
       this.itensNaoCategorizados.push(itemNaoCategorizado);
 
@@ -70,14 +64,271 @@ export class ChecklistPage {
       this._tree.treeModel.update();
    }
 
+   public json: Checklist = {
+      "id": 0,
+      "descricao": "Venda",
+      "checkListEtapas": [
+         {
+            "id": 0,
+            "descricao": "Conversação com o cliente",
+            "children": [
+               {
+                  "id": 0,
+                  "descricao": "Retorno marcado",
+                  "children": [],
+                  "prazo": null,
+                  "posicao": 0,
+                  "dataConclusao": null
+               },
+               {
+                  "id": 0,
+                  "descricao": "Venda realizada",
+                  "children": [
+                     {
+                        "id": 0,
+                        "descricao": "Definiu formas de pgto",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Impressora",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Leitor",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Bobina",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Informática em geral",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Certificado",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     }
+                  ],
+                  "prazo": null,
+                  "posicao": 0,
+                  "dataConclusao": null
+               },
+               {
+                  "id": 0,
+                  "descricao": "Venda não realizada ",
+                  "children": [
+                     {
+                        "id": 0,
+                        "descricao": "Ofereceu produtos da loja",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     }
+                  ],
+                  "prazo": null,
+                  "posicao": 0,
+                  "dataConclusao": null
+               }
+            ],
+            "prazo": null,
+            "posicao": 0,
+            "dataConclusao": null
+         },
+         {
+            "id": 0,
+            "descricao": "Setor técnico ",
+            "children": [
+               {
+                  "id": 0,
+                  "descricao": "Instalação",
+                  "children": [
+                     {
+                        "id": 0,
+                        "descricao": "Criação de banco de dados",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Migrar produtos/clientes",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Cópia de arquivos",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "App IIS criado",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Inst. impressora térmica ",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Inst. outros periféricos ",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Inst. certificado digital",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "CSC configurado",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     },
+                     {
+                        "id": 0,
+                        "descricao": "Abriu sistema",
+                        "children": [],
+                        "prazo": null,
+                        "posicao": 0,
+                        "dataConclusao": null
+                     }
+                  ],
+                  "prazo": null,
+                  "posicao": 0,
+                  "dataConclusao": null
+               }
+            ],
+            "prazo": null,
+            "posicao": 0,
+            "dataConclusao": null
+         },
+         {
+            "id": 0,
+            "descricao": "Setor financeiro",
+            "children": [
+               {
+                  "id": 0,
+                  "descricao": "Pós venda",
+                  "children": [],
+                  "prazo": null,
+                  "posicao": 0,
+                  "dataConclusao": null
+               },
+               {
+                  "id": 0,
+                  "descricao": "Liberação de licença",
+                  "children": [],
+                  "prazo": null,
+                  "posicao": 0,
+                  "dataConclusao": null
+               },
+               {
+                  "id": 0,
+                  "descricao": "Geração de boletos",
+                  "children": [],
+                  "prazo": null,
+                  "posicao": 0,
+                  "dataConclusao": null
+               }
+            ],
+            "prazo": null,
+            "posicao": 0,
+            "dataConclusao": null
+         }
+      ]
+   };
+
    onSubmit() {
+      this.itensCategorizados.forEach(checklistEtapa => {
+         this._itemTemId(checklistEtapa);
+      });
+
       const checklistName = this.checkListNameCtrl.value;
       const checklist = new Checklist(0, checklistName, this.itensCategorizados);
 
-      this._checklistService
-         .createAll(checklist)
+      this
+         ._checklistService
+         .createAll(this.json)
          .subscribe(() => {
             this._toastr.success('Sucesso!', '', environment.toastrConfig);
+            this._limparCampos();
          }, err => console.log(err));
+   }
+
+   private _itemTemId(model) {
+      if (model.id != 0)
+         model.id = 0;
+
+      for (let i = 0; i < model.children.length; i++) {
+         const filho = model.children[i];
+
+         if (filho)
+            this._itemTemId(filho)
+      }
+   }
+
+   private _limparCampos() {
+      this.checkListNameCtrl.reset();
+      this.form.reset();
+
+      this.itensCategorizados = [];
+      this.itensNaoCategorizados = [];
+   }
+
+   removerChecklistEtapa(node) {
+      const index = this.itensNaoCategorizados.indexOf(node.data);
+
+      if (index < 0) return;
+
+      this.itensNaoCategorizados.splice(index, 1);
+
+      this._tree.treeModel.update();
    }
 }

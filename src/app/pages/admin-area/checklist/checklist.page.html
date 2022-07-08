@@ -1,7 +1,7 @@
 <div class="container">
    <div class="row">
       <div class="col-12 rounded shadow p-4 mt-4" style="height: 80vh;">
-         <div class="row">
+         <div class="row" style="height: 100%;">
             <div class="col-6" style="height: 80%;">
                <div class="row">
                   <div class="col-6">
@@ -24,29 +24,35 @@
 
                   <span class="mt-3"></span>
 
-                  <div class="example-container">
+                  <div class="example-container" style="height: 53vh;">
                      <h4>Itens não categorizados</h4>
 
-                     <tree-root #tree [options]="options" [focused]="true" [nodes]="itensNaoCategorizados" (moveNode)="onMove($event)"></tree-root>
+                     <tree-root #tree [options]="options2" [focused]="true" [nodes]="itensNaoCategorizados" style="overflow: auto;">
+                        <ng-template  #treeNodeWrapperTemplate let-node let-index="index">
+                           <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
+                              <tree-node-expander [node]="node"></tree-node-expander>
+                              <div class="node-content-wrapper" [class.node-content-wrapper-active]="node.isActive" [class.node-content-wrapper-focused]="node.isFocused" (click)="node.mouseAction('click', $event)" (dblclick)="node.mouseAction('dblClick', $event)" (contextmenu)="node.mouseAction('contextMenu', $event)" (treeDrop)="node.onDrop($event)" [treeAllowDrop]="node.allowDrop" [treeDrag]="node" [treeDragEnabled]="node.allowDrag()">
+
+                                 <tree-node-content [node]="node" [index]="index"></tree-node-content>
+                              </div>
+
+                              <i class="fas fa-times" style="margin-left: 12px; margin-top: auto; margin-bottom: auto;" (click)="removerChecklistEtapa(node)"></i>
+                           </div>
+                        </ng-template>
+                     </tree-root>
                   </div>
                </div>
             </div>
-            <div class="col-6" style="height: 50vh;">
+            <div class="col-6" style="height: 95%;">
                <div class="row">
 
-                  <div class="col-12">
+                  <div class="col-12" style="height: 62vh;">
                      <h4>Itens categorizados</h4>
 
-                     <tree-root [options]="options" [focused]="true" [nodes]="itensCategorizados" (moveNode)="onMove($event)"></tree-root>
+                     <tree-root [options]="options" [focused]="true" [nodes]="itensCategorizados" style="overflow: auto;"></tree-root>
                   </div>
 
                </div>
-            </div>
-
-            <div class="col-6"></div>
-
-            <div class="col-6 border rounded mb-3" style="height: 15vh;">
-
             </div>
 
             <div class="col-12 text-end">

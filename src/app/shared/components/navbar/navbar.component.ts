@@ -1,6 +1,8 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, Input, OnInit } from '@angular/core';
 import { Security } from 'src/app/shared/utils/security.util';
+import { Board } from '../../models/board';
+import { Kanban } from '../../utils/kanban.util';
 
 @Component({
    selector: 'app-navbar',
@@ -10,6 +12,7 @@ import { Security } from 'src/app/shared/utils/security.util';
 export class NavbarComponent implements OnInit {
    @Input() drawerReceived;
    loggedUser = Security.getUser();
+   currentBoard: Board;
 
    constructor(
       private _router: Router,
@@ -17,6 +20,11 @@ export class NavbarComponent implements OnInit {
    ) { }
 
    ngOnInit(): void {
+      new Promise(resolve => {
+         setTimeout(() => {
+            this.currentBoard = Kanban.getCurrentBoard();
+         }, 500);
+       });
    }
 
    logout() {
